@@ -1,0 +1,15 @@
+template:
+    url: https://github.com/CouscousPHP/Template-Light
+
+# Base URL of the published website
+baseUrl: https://target.github.io/webbreaker/
+
+# Used to link to the GitHub project
+github:
+    user: target
+    repo: webbreaker
+    url: github.com
+
+title: Webbreaker
+subTitle: Centrally administer Dynamic Application Security Testing (DAST), as part of your DevOps pipeline
+

@@ -1,0 +1,2 @@
+# Webmacros
+Proprietary functional recordings of either a login or workflow of the website to scan, both files are encoded and are not compatable with any 3rd party product.  If a website requires authentication the login webmacro is required otherwise WebInspect will not be able to test any page enforcing authentication.  The workflow macro is a recording of a base case functional use of the website and is optional.  Alernatively, a website can be scanned by providing a list of URLs in-scope to scan. 
