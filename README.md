@@ -104,8 +104,6 @@ WebBreaker provides notifications for start-scan and end-scan events. A simple p
 
 The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
 
-The database notifier inserts the provided event data into a PostgreSQL table. All database connection settings are stored in an external file located at the path defined under the 'database' section of [webbreaker/etc/webbreaker.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/webbreaker.ini).
-
 If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
 
 ### Bugs and Feature Requests
