@@ -8,7 +8,6 @@ except ImportError: #Python3
     import configparser
 import os
 from webbreaker.webbreakerhelper import WebBreakerHelper
-from webbreaker.notifiers import database
 from webbreaker.notifiers import emailer
 from webbreaker.webbreakerlogger import Logger
 from webbreaker.notifiers import reporter
