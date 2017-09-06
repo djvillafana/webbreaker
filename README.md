@@ -9,7 +9,7 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 ### Supported Features ###
 * Command-line (CLI) scan administration of WebInspect with Foritfy SSC products.
 * Docker container support
-* [Jenkins Continuous Deployment](https://jenkins.io) suport
+* [Jenkins Continuous Deployment](https://jenkins.io) support
 * Email alerting or notification.
 * Extensible event scan logging with scan output.
 * [WebInspect REST API](https://pypi.python.org/pypi/webinspectapi) support for v9.30 and later.
