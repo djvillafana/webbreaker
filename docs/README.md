@@ -10,6 +10,8 @@
 - [Installation: `installation`](#installation)
 - [Supported Features `supported_features`](#supported-features)
 - [Usage](#usage)
+- [Logging](#logging)
+- [Notifications](#notification)
 
 [Configurations](#configurations)
 
@@ -80,6 +82,16 @@ A promper Webbreaker command utilizes the structure 'webbreaker [webinspect|fort
   - This command accepts a --application option and if given will list all version of that application found in Fortify. If --application  is not used, this command will list all versions of all applications found on Fortify.
 - fortify upload
   - This command requires the --fortify_version and -x options and will upload the scan file {fortify_version}.{x} to the specified application version on Fortify.
+
+## Logging
+WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
+
+## Notifications
+WebBreaker provides notifications for start-scan and end-scan events. A simple publisher/subscriber pattern is implemented under the ```webbreaker/notifiers```.  A Reporter object will hold a collection of Notifiers, each of which implements a Notify function responsible for creating the desired notification. Currently, two notification types are implemented email and database.
+
+The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
+
+If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
 
 ## Configurations
 
