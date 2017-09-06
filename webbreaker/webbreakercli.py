@@ -40,7 +40,6 @@ from webbreaker.fortifyconfig import FortifyConfig
 from webbreaker.webinspectscanhelpers import create_scan_event_handler
 #from webbreaker.webinspectscanhelpers import write_end_event
 from webbreaker.webinspectscanhelpers import scan_running
-from webbreaker.webinspectscanhelpers import save_issues
 
 
 handle_scan_event = None
@@ -247,7 +246,6 @@ def scan(config, **kwargs):
 
         webinspect_client.export_scan_results(scan_id, 'fpr')
         webinspect_client.export_scan_results(scan_id, 'xml')
-        save_issues(webinspect_client, scan_id, webinspect_settings)
         handle_scan_event('scan_end')
 
         Logger.file_logr.critical('Scan has finished.')
