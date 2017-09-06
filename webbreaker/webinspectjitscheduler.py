@@ -4,8 +4,7 @@
 import random
 import sys
 import time
-from webinspectapi import WebInspectApi as webinspectapi
-#import webinspectapi.webinspect as webinspectapi
+import webinspectapi.webinspect as webinspectapi
 from webbreaker.webbreakerlogger import Logger
 
 
@@ -77,7 +76,7 @@ class WebInspectJitScheduler(object):
         :param endpoint: The endpoint to evaluate
         :param max_concurrent_scans:  The max number of allowed scans to be running on the endpoint
         """
-        api = webinspectapi(endpoint[0], verify_ssl=False)
+        api = webinspectapi.WebInspectApi(endpoint[0], verify_ssl=False)
         response = api.list_scans()
         active_scans = 0
         if response.success:

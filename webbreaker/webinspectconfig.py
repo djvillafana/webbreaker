@@ -105,96 +105,95 @@ class WebInspectConfig(object):
     def parse_webinspect_options(self, options):
         webinspect_dict = {}
 
-        if not options.scan_name:
+        if not options['scan_name']:
             try:
                 if runenv == "jenkins":
-                    options.scan_name = os.getenv("JOB_NAME")
-                    if "/" in options.scan_name:
-                        options.scan_name = os.getenv("BUILD_TAG")
+                    options['scan_name'] = os.getenv("JOB_NAME")
+                    if "/" in options['scan_name']:
+                        options['scan_name'] = os.getenv("BUILD_TAG")
                 else:
-                    options.scan_name = "webinspect" + "-" + "".join(
+                    options['scan_name'] = "webinspect" + "-" + "".join(
                         random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
             except AttributeError as e:
-                Logger.file_logr.error("The {0} is unable to be created! {1}".format(options.scan_name, e))
+                Logger.file_logr.error("The {0} is unable to be created! {1}".format(options['scan_name'], e))
 
-        if options.upload_settings:
+        if options['upload_settings']:
             try:
-                options.upload_scan_settings = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                options['upload_scan_settings'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                             'webbreaker', 'etc', 'webinspect',
                                                                             'settings',
-                                                                            options.upload_settings)))
+                                                                            options['upload_settings'])))
             except (AttributeError, TypeError) as e:
-                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options.upload_settings, e))
+                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_settings'], e))
         else:
-            options.upload_settings = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+            options['upload_settings'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                    'webbreaker', 'etc', 'webinspect', 'settings',
-                                                                   options.settings + '.xml')))
+                                                                   options['settings'] + '.xml')))
 
         # if login macro has been specified, ensure it's uploaded.
-        if options.login_macro:
-            if options.upload_webmacros:
+        if options['login_macro']:
+            if options['upload_webmacros']:
                 # add macro to existing list.
-                options.upload_webmacros.append(options.login_macro)
+                options['upload_webmacros'].append(options['login_macro'])
             else:
                 # add macro to new list
-                options.upload_webmacros = []
-                options.upload_webmacros.append(options.login_macro)
+                options['upload_webmacros'] = []
+                options['upload_webmacros'].append(options['login_macro'])
 
         # if workflow macros have been provided, ensure they are uploaded
-        if options.workflow_macros:
-            if options.upload_webmacros:
+        if options['workflow_macros']:
+            if options['upload_webmacros']:
                 # add macros to existing list
-                options.upload_webmacros.extend(options.workflow_macros)
+                options['upload_webmacros'].extend(options['workflow_macros'])
             else:
                 # add macro to new list
-                options.upload_webmacros = list(options.workflow_macros)
+                options['upload_webmacros'] = list(options['workflow_macros'])
 
-        if options.upload_webmacros:
+        if options['upload_webmacros']:
             try:
                 # trying to be clever, remove any duplicates from our upload list
-                options.upload_webmacros = list(set(options.upload_webmacros))
-                options.upload_webmacros = [str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                options['upload_webmacros'] = list(set(options['upload_webmacros']))
+                options['upload_webmacros'] = [str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                          'webbreaker', 'etc', 'webinspect', 'webmacros',
                                                                          webmacro + '.webmacro'))) for webmacro in
-                                            options.upload_webmacros]
+                                            options['upload_webmacros']]
             except (AttributeError, TypeError) as e:
-                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options.upload_webmacros, e))
+                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_webmacros'], e))
 
         # if upload_policy provided explicitly, follow that. otherwise, default to scan_policy if provided
-        if options.upload_policy:
-            options.upload_policy = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+        if options['upload_policy']:
+            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                  'webbreaker', 'etc', 'webinspect', 'policies',
-                                                                 options.upload_policy + '.policy')))
-        elif options.scan_policy:
-            options.upload_policy = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                                                 options['upload_policy'] + '.policy')))
+        elif options['scan_policy']:
+            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                  'webbreaker', 'etc', 'webinspect', 'policies',
-                                                                 options.scan_policy + '.policy')))
+                                                                 options['scan_policy'] + '.policy')))
 
         # Determine the targets specified in a settings file
-        targets = self.__getScanTargets__(options.upload_settings)
+        targets = self.__getScanTargets__(options['upload_settings'])
 
         # Unless explicitly stated --allowed_hosts by default will use all values from --start_urls
-        if not options.allowed_hosts:
-            options.allowed_hosts = options.start_urls
+        if not options['allowed_hosts']:
+            options['allowed_hosts'] = options['start_urls']
 
         try:
-            webinspect_dict['webinspect_settings'] = options.settings
-            webinspect_dict['webinspect_scan_name'] = options.scan_name
-            webinspect_dict['webinspect_upload_settings'] = options.upload_settings
-            webinspect_dict['webinspect_upload_policy'] = options.upload_policy
-            webinspect_dict['webinspect_upload_webmacros'] = options.upload_webmacros
-            webinspect_dict['webinspect_overrides_scan_mode'] = options.scan_mode
-            webinspect_dict['webinspect_overrides_scan_scope'] = options.scan_scope
-            webinspect_dict['webinspect_overrides_login_macro'] = options.login_macro
-            webinspect_dict['webinspect_overrides_scan_policy'] = options.scan_policy
-            webinspect_dict['webinspect_overrides_scan_start'] = options.scan_start
-            webinspect_dict['webinspect_overrides_start_urls'] = options.start_urls
+            webinspect_dict['webinspect_settings'] = options['settings']
+            webinspect_dict['webinspect_scan_name'] = options['scan_name']
+            webinspect_dict['webinspect_upload_settings'] = options['upload_settings']
+            webinspect_dict['webinspect_upload_policy'] = options['upload_policy']
+            webinspect_dict['webinspect_upload_webmacros'] = options['upload_webmacros']
+            webinspect_dict['webinspect_overrides_scan_mode'] = options['scan_mode']
+            webinspect_dict['webinspect_overrides_scan_scope'] = options['scan_scope']
+            webinspect_dict['webinspect_overrides_login_macro'] = options['login_macro']
+            webinspect_dict['webinspect_overrides_scan_policy'] = options['scan_policy']
+            webinspect_dict['webinspect_overrides_scan_start'] = options['scan_start']
+            webinspect_dict['webinspect_overrides_start_urls'] = options['start_urls']
             webinspect_dict['webinspect_scan_targets'] = targets
-            webinspect_dict['webinspect_workflow_macros'] = options.workflow_macros
-            webinspect_dict['webinspect_allowed_hosts'] = options.allowed_hosts
-            webinspect_dict['webinspect_scan_size'] = options.size if options.size else self.default_size
-            webinspect_dict['fortify_user'] = options.fortify_user
-            webinspect_dict['extension'] = options.extension
+            webinspect_dict['webinspect_workflow_macros'] = options['workflow_macros']
+            webinspect_dict['webinspect_allowed_hosts'] = options['allowed_hosts']
+            webinspect_dict['webinspect_scan_size'] = options['size'] if options['size'] else self.default_size
+            webinspect_dict['fortify_user'] = options['fortify_user']
 
         except argparse.ArgumentError as e:
             Logger.file_logr.error("There was an error in the options provided!: ".format(e))

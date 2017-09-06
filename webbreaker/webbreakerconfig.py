@@ -25,8 +25,8 @@ except NameError:  # Python 3
 class WebBreakerConfig(object):
     def parse_fortify_settings(self):
         fortify_dict = {}
-        fortify_setting = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                       '.fortifyrc')
+        #fortify_setting = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.fortifyrc')
+        fortify_setting = os.path.abspath(os.path.join('webbreaker', 'etc', 'fortify.ini'))
         if os.path.exists(fortify_setting):
             fortify_dict = {}
             config.read(fortify_setting)
@@ -45,9 +45,8 @@ class WebBreakerConfig(object):
 
     def parse_emailer_settings(self):
         emailer_dict = {}
-        emailer_setting = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                       '.emailerrc')
-
+        #emailer_setting = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.emailerrc')
+        emailer_setting = os.path.abspath(os.path.join('webbreaker', 'etc', 'email.ini'))
         if os.path.exists(emailer_setting):
             config.read(emailer_setting)
 
