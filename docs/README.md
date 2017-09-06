@@ -9,6 +9,7 @@
 
 - [Installation: `installation`](#installation)
 - [Supported Features `supported_features`](#supported-features)
+- [Usage](#usage)
 
 [Configurations](#configurations)
 
@@ -53,6 +54,32 @@ WebBreaker releases are packaged on github.com and can be installed locally.
 * Local [logging](webbreaker/etc/logging.ini) of WebInspect scan state.
 * [Superset data visualization dashboard](https://github.com/airbnb/superset) support for scan status and performance.
 
+### Usage
+#### Command Hierarchy
+Webbreak utilizes a structure of upper-level and lower-level commands to enable interaction with multiple 3rd party platforms. The two platforms currently supported are WebInspect and Fortfiy and they can be accessed using their respective upper-level commands. Webbreaker supports multiple functions for each platform which are accessed via lower-level commands. The current command structure is listed below.
+
+- webbreaker
+  - webinspect
+    - scan
+    - list
+    - download
+  - fortify
+    - list
+    - upload
+
+A promper Webbreaker command utilizes the structure 'webbreaker [webinspect|fortify] [lower-level command] [OPTIONS]'
+
+#### Lower Level Command Features
+- webinspect scan
+  - This command will choose an available webinspect server and initiate a scan based on the given options. Upon scan completion the results will be downloaded in the specified format.
+- webinspect list
+  - This command requires the --server option and will list the Name, ID, and Status of all scans found on that host. This command also accepts the --scan_name option and if provided will limit the output to scans which match that name.
+- webinspect download
+  - This command requires the --server and --scan_name options and will download scan results in the desired format. If multiple scans match --scan_name they will be listed and nothing will be downloaded.
+- fortify list
+  - This command accepts a --application option and if given will list all version of that application found in Fortify. If --application  is not used, this command will list all versions of all applications found on Fortify.
+- fortify upload
+  - This command requires the --fortify_version and -x options and will upload the scan file {fortify_version}.{x} to the specified application version on Fortify.
 
 ## Configurations
 
