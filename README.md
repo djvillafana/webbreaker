@@ -7,15 +7,16 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 ![WebBreaker System Architecture](images/WebBreakerSystemArchitecture.jpg)
 
 ### Supported Features ###
-* Immutable WebInspect scan configurations for Cloud scanning
-* Extensible scan telemetry with ArcSight, ELK, Splunk, etc.
-* Event notifications with scan launch and completion
-* [Superset data visualization dashboard](https://github.com/airbnb/superset) support for scan status and performance.
-* Enterprise load balancing between 2 or greater WebInspect Sensors
-* Support for scan collaborative analysis with Fortify SSC
+* Command-line (CLI) scan administration of WebInspect with Foritfy SSC products.
 * Docker container support
-* Jenkins global environmental variable inheritance with scan options.
-* WebInspect REST API support for v9.30 and above.
+* [Jenkins Continuous Deployment](https://jenkins.io) suport
+* Email alerting or notification.
+* Extensible event scan logging with scan output.
+* [WebInspect REST API](https://pypi.python.org/pypi/webinspectapi) support for v9.30 and later.
+* [Fortify Software Security Center (SSC) REST API](https://pypi.python.org/pypi/fortifyapi) support for v16.10 and later.
+* WebInspect scan cluster support between two (2) or greater WebInspect servers/sensors
+* Extensible scan telemetry with ELK and Splunk
+* GIT support for WebInspect scan configurations.
 
 ### Usage ###
 WebBreaker implements a command-line interface (CLI), specific to a Product.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  The two Products supported are WebInspect and Fortfiy.  Below is complete documentation of WebBreaker's usage.
