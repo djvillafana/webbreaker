@@ -108,6 +108,37 @@ Usage:
       -x                    Specifies the extension of the file to be uploaded. WebBreaker will attempt to upload the file
                             {fortify_version}.{x}
 
+### Cheatsheet
+**For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
+
+|   | WebInspect List Commands |
+| ------------------- | ------- |
+| _List all scans_   | `webbreaker webinspect list --server webinspect-server-1.example.com:8083`  |
+| _Query scans_  | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site` |
+| _List with http_ | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http` |
+
+|  | WebInspect Downlaod Commands |
+| ------------------- | ------- |
+| _Download Scan_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth` |
+| _Download Scan as XML_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml` |
+| _Download Scanwith http_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http` |
+
+|  | WebInspect Scan Commands |
+| ------------------- | ------- |
+| _Basic Scan_ | `webbreaker webinspect scan --settings important_site_auth` |
+| _Scan using multiple of same option_ | `webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com` |
+
+|  | Fortify List Commands |
+| ------------------- | ------- |
+| _List with passed auth_ | `webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS` |
+| _List with username/password prompts_ | `webbreaker fortify list` |
+| _List versions of application_ | `webbreaker fortify list --application webinspect` |
+
+|  | Fortify Upload Commands |
+| ------------------- | ------- |
+| _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --fortify_version important_site_auth -x fpr` |
+| _Upload with username/password prompts_ | `webbreaker fortify upload --fortify_version important_site_auth -x fpr` |
+
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
@@ -168,40 +199,6 @@ If an error occurs on behalf of the notifiers at any point during the process of
 ### Bugs and Feature Requests
 
 Found something that doesn't seem right or have a feature request? [Please open a new issue](https://github.com/target/webbreaker/issues/new/).
-
-
-### Cheatsheet
-**For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
-
-|   | WebInspect List Commands |
-| ------------------- | ------- |
-| _List all scans_   | `webbreaker webinspect list --server webinspect-server-1.example.com:8083`  |
-| _Query scans_  | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site` |
-| _List with http_ | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http` |
-
-|  | WebInspect Downlaod Commands |
-| ------------------- | ------- |
-| _Download Scan_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth` |
-| _Download Scan as XML_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml` |
-| _Download Scanwith http_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http` |
-
-|  | WebInspect Scan Commands |
-| ------------------- | ------- |
-| _Basic Scan_ | `webbreaker webinspect scan --settings important_site_auth` |
-| _Scan using multiple of same option_ | `webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com` |
-
-|  | Fortify List Commands |
-| ------------------- | ------- |
-| _List with passed auth_ | `webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS` |
-| _List with username/password prompts_ | `webbreaker fortify list` |
-| _List versions of application_ | `webbreaker fortify list --application webinspect` |
-
-|  | Fortify Upload Commands |
-| ------------------- | ------- |
-| _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --fortify_version important_site_auth -x fpr` |
-| _Upload with username/password prompts_ | `webbreaker fortify upload --fortify_version important_site_auth -x fpr` |
-
-
 
 ### Copyright and License
 
