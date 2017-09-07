@@ -122,8 +122,13 @@ class FortifyClient(object):
                             # we have a matching project version
                             Logger.file_logr.debug("Found existing project version {0}".format(project_version['id']))
                             return project_version['id']
-                # didn't find a matching project version, so create one
-                return self.__create_project_version__()
+                # Didn't find a matching project version, verify that our project exists
+                for project_version in response.data['data']:
+                        if project_version['project']['name'] == self.application_name:
+                            # Our project exsits, so create a new version
+                            return self.__create_project_version__()
+                # Let upload_scan know that our project doesn't exist
+                return -2
             elif "401" in response.message:
                 # Avoid printing error for invalid token. Return -1 to reauth
                 return -1
@@ -137,6 +142,9 @@ class FortifyClient(object):
     def upload_scan(self):
         api = FortifyApi(self.ssc_server, token=self.token, verify_ssl=False)
         project_version_id = self.__get_project_version__()
+        # If our project doesn't exist, exit upload_scan
+        if project_version_id == -2:
+           return -2
         if project_version_id == -1:
             return -1
         if not project_version_id:

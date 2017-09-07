@@ -419,6 +419,9 @@ def fortify_list(config, fortify_user, fortify_password, application):
 @fortify.command()
 @click.option('--fortify_user')
 @click.option('--fortify_password')
+@click.option('--application',
+              required=False,
+              help="Name of the Fortify application that version belongs to. If this option is not provided, application_name from fortify.ini will be used.")
 @click.option('--version',
               required=True,
               help="Name of Fortify application version which you would like to upload a scan to.")
@@ -426,8 +429,10 @@ def fortify_list(config, fortify_user, fortify_password, application):
               required=True,
               help="Extension of scan file being uploaded")
 @pass_config
-def upload(config, fortify_user, fortify_password, version, x):
+def upload(config, fortify_user, fortify_password, application, version, x):
     fortify_config = FortifyConfig()
+    if application:
+        fortify_config.application_name = application
     try:
         if not fortify_user or not fortify_password:
             Logger.file_logr.debug("No Fortify username or password provided. Checking fortify.ini for secret")
@@ -460,6 +465,10 @@ def upload(config, fortify_user, fortify_password, version, x):
 
         reauth = fortify_client.upload_scan()
 
+        if reauth == -2:
+            # The given application doesn't exist
+            Logger.file_logr.critical("Fortify Application {} does not exist. Unable to upload scan.".format(application))
+
         if reauth == -1 and fortify_config.secret:
             Logger.file_logr.debug("Fortify secret invalid...reauthorizing")
             fortify_user = click.prompt('Fortify user')
@@ -472,7 +481,12 @@ def upload(config, fortify_user, fortify_password, version, x):
             fortify_config.write_secret(fortify_client.token)
             Logger.file_logr.debug("Fortify secret written to fortify.ini")
             Logger.file_logr.debug("Attempting to rerun 'fortify upload'")
-            fortify_client.upload_scan()
+            app_error = fortify_client.upload_scan()
+
+            if app_error == -2:
+                # The given application doesn't exist
+                Logger.file_logr.critical(
+                    "Fortify Application {} does not exist. Unable to upload scan.".format(application))
     except:
         Logger.file_logr.critical("Unable to complete command 'fortify upload'")
 
