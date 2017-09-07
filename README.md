@@ -102,6 +102,8 @@ Usage:
       --fortify_user /      If provided WebBreaker authenticates to Fortify using these credentials. If not provided
         --fortify_password  WebBreaker attempts to use a secret for fortify.ini. If no secret is found our the secret is
                             no longer valid, you will be prompted for these credentials.
+      --application         If provided WebBreaker will look for version under this application name instead of the one
+                            provided in fortify.ini
       --version     Used for the command 'fortify upload' this option specifies the application version name and
                             is used to both locate the file to be uploaded and the correct fortify application version
                             to upload the file to.
@@ -138,6 +140,7 @@ Usage:
 | ------------------- | ------- |
 | _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth -x fpr` |
 | _Upload with username/password prompts_ | `webbreaker fortify upload --version important_site_auth -x fpr` |
+| _Upload with application overide_ | `webbreaker fortify upload --application my_other_app --version important_site_auth -x fpr` |
 
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.

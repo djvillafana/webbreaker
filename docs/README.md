@@ -155,6 +155,10 @@ Upload the file important_site_auth.fpr to the important_site_auth version on Fo
 > webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth -x fpr
 ```
 
+Upload the file important_site_auth.fpr to the important_site_auth version under the application my_other_app on Fortify. If --application is not provided, WebBreaker will use the application name found in fortify.ini
+```
+> webbreaker fortify upload --application my_other_app --version important_site_auth -x fpr
+```
 ## Configurations
 
 ### Fortify Configuration: `fortify_config`
