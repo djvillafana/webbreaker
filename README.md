@@ -108,6 +108,37 @@ Usage:
       -x                    Specifies the extension of the file to be uploaded. WebBreaker will attempt to upload the file
                             {fortify_version}.{x}
 
+### Cheatsheet
+**For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
+
+|   | WebInspect List Commands |
+| ------------------- | ------- |
+| _List all scans_   | `webbreaker webinspect list --server webinspect-server-1.example.com:8083`  |
+| _Query scans_  | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site` |
+| _List with http_ | `webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http` |
+
+|  | WebInspect Downlaod Commands |
+| ------------------- | ------- |
+| _Download Scan_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth` |
+| _Download Scan as XML_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml` |
+| _Download Scanwith http_ | `webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http` |
+
+|  | WebInspect Scan Commands |
+| ------------------- | ------- |
+| _Basic Scan_ | `webbreaker webinspect scan --settings important_site_auth` |
+| _Scan using multiple of same option_ | `webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com` |
+
+|  | Fortify List Commands |
+| ------------------- | ------- |
+| _List with passed auth_ | `webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS` |
+| _List with username/password prompts_ | `webbreaker fortify list` |
+| _List versions of application_ | `webbreaker fortify list --application webinspect` |
+
+|  | Fortify Upload Commands |
+| ------------------- | ------- |
+| _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --fortify_version important_site_auth -x fpr` |
+| _Upload with username/password prompts_ | `webbreaker fortify upload --fortify_version important_site_auth -x fpr` |
+
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
@@ -119,21 +150,21 @@ The three (3) command-line usage examples illustrate the minimum _required_, _sc
 
 + Minimal WebBreaker command, setup.py needs to be ran once for installing python dependencies.  Your Python site-packages must be included in your PATH to run from the command-line locally.
 ```
-> webbreaker webinspect scan --settings=Default.xml
+> webbreaker webinspect scan --settings Default
 ```
 + WebBreaker command without the _`--settings`_ option, creating an authenitcated scan with no pre-determined scan values.
 ```
-> webbreaker webinspect scan --login_macro=some_login_macro --start_urls=example.com --scan_policy=Standard --scan_start=url --allowed_hosts=foo.example.com bar.example.com
+> webbreaker webinspect scan --login_macro some_login_macro --start_urls example.com --scan_policy Standard --scan_start url --allowed_hosts foo.example.com --allowed_hosts bar.example.com
 ```
 + Jenkins command-line with Shell plugin in Build or Post-Build task:
 ```
-> webbreaker webinspect scan --settings=Default.xml --scan_name=${BUILD_TAG}
+> webbreaker webinspect scan --settings Default --scan_name ${BUILD_TAG}
 ```
 
 ### Executing or Running WebBreaker ###
 
 ```
-webbreaker webinspect --url=https://some.webinspect.server.com --settings=MyCustomWebinspectSetting --scan_policy=Application --scan_name=some_scan_name
+webbreaker webinspect scan --settings MyCustomWebinspectSetting --scan_policy Application --scan_name some_scan_name
  _       __     __    ____                  __            
 | |     / /__  / /_  / __ )________  ____ _/ /_____  _____
 | | /| / / _ \/ __ \/ __  / ___/ _ \/ __ `/ //_/ _ \/ ___/
