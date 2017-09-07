@@ -94,13 +94,7 @@ setup(
                               'webbreaker/etc/email.ini',
                               'webbreaker/etc/webinspect.ini',
                               'images/WebBreakerArchitecture.jpg']
-                  },
-    # No proprietary WebInspect configurations are packaged with distro
-    data_files=[
-        ('webbreaker',  ['webbreaker/etc/webinspect/webmacros/README.md',
-                         'webbreaker/etc/webinspect/policies/README.md',
-                         'webbreaker/etc/webinspect/settings/README.md'],)
-    ],
+    },
     install_requires=requires,
     entry_points='''
         [console_scripts]
