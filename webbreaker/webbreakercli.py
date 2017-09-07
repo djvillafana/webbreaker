@@ -425,12 +425,11 @@ def fortify_list(config, fortify_user, fortify_password, application):
 @click.option('--version',
               required=True,
               help="Name of Fortify application version which you would like to upload a scan to.")
-@click.option('-x',
-              required=True,
-              help="Extension of scan file being uploaded")
 @pass_config
-def upload(config, fortify_user, fortify_password, application, version, x):
+def upload(config, fortify_user, fortify_password, application, version):
     fortify_config = FortifyConfig()
+    # Fortify only accepts fpr scan files
+    x = 'fpr'
     if application:
         fortify_config.application_name = application
     try:

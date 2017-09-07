@@ -107,8 +107,6 @@ Usage:
       --version     Used for the command 'fortify upload' this option specifies the application version name and
                             is used to both locate the file to be uploaded and the correct fortify application version
                             to upload the file to.
-      -x                    Specifies the extension of the file to be uploaded. WebBreaker will attempt to upload the file
-                            {fortify_version}.{x}
 
 ### Cheatsheet
 **For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
@@ -138,9 +136,9 @@ Usage:
 
 |  | Fortify Upload Commands |
 | ------------------- | ------- |
-| _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth -x fpr` |
-| _Upload with username/password prompts_ | `webbreaker fortify upload --version important_site_auth -x fpr` |
-| _Upload with application overide_ | `webbreaker fortify upload --application my_other_app --version important_site_auth -x fpr` |
+| _Upload with passed auth_ | `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth` |
+| _Upload with username/password prompts_ | `webbreaker fortify upload --version important_site_auth` |
+| _Upload with application overide_ | `webbreaker fortify upload --application my_other_app --version important_site_auth` |
 
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
