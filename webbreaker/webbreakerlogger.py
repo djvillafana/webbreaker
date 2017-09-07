@@ -40,41 +40,35 @@ def get_console_logger():
     return console_logger
 
 
-def get_file_logger(name=None):
+def get_app_logger(name=None):
     default = "__webbreaker__"
-    log_map = {"__webbreaker__": APP_LOG, "__webbreaker_debug__": DEBUG_LOG}
+    log_map = {"__webbreaker__": APP_LOG}
 
     if name:
-        logger = logging.getLogger(name)
+        app_logger = logging.getLogger(name)
     else:
-        logger = logging.getLogger(default)
+        app_logger = logging.getLogger(default)
 
     formatter = logging.Formatter('%(asctime)s: %(name)s %(levelname)s(%(message)s')
     fh = logging.FileHandler(log_map[name], 'a')
     fh.setFormatter(formatter)
-    logger.addHandler(fh)
-    # TODO: separate this out between app and debug files
-    logger.setLevel(logging.DEBUG)
-    return logger
+    app_logger.setLevel(logging.DEBUG)
+    app_logger.addHandler(fh)
+    return app_logger
 
 
-def get_stout_logger(name=None):
-    default = "__webbreaker_stout__"
-    stout_log_map = {"__webbreaker_stout__": STOUT_LOG, "__splunk__": SPLUNK_LOG}
+def get_debug_logger(name=None):
+    #log_map = {"__webbreaker_debug__": DEBUG_LOG}
+    debug_logger = logging.getLogger(name)
+    debug_logger.setLevel(logging.NOTSET)
+    debug_formatter = logging.Formatter('%(asctime)s: %(name)s %(levelname)s(%(message)s')
 
-    if name:
-        stout_logger = logging.getLogger(name)
-    else:
-        stout_logger = logging.getLogger(default)
+    fh = logging.FileHandler(DEBUG_LOG, mode='a')
+    fh.setFormatter(debug_formatter)
+    fh.setLevel(logging.DEBUG)
+    debug_logger.addHandler(fh)
 
-    oh = logging.StreamHandler(stream=sys.stdout)
-    oh.setFormatter(FORMATTER)
-    # Only send stout INFO level messages
-    oh.setLevel(logging.INFO)
-    # stout does not include less than and equal to WARNING
-    oh.addFilter(LessThenFilter(logging.WARNING))
-    stout_logger.addHandler(oh)
-    return stout_logger
+    return debug_logger
 
 
 # Override existing hierarchical filter logic in logger mod
@@ -90,10 +84,7 @@ class LessThenFilter(logging.Filter):
 @singleton
 class Logger():
     def __init__(self):
-        self.app = get_file_logger("__webbreaker__")
-        self.debug = get_file_logger("__webbreaker_debug__")
-        self.output = get_stout_logger("__webbreaker_stout__")
-        self.splunk = get_stout_logger("__splunk_webinspect__")
-
+        self.app = get_app_logger("__webbreaker__")
+        self.debug = get_debug_logger("__webbreaker_debug__")
         self.console = get_console_logger()
 
