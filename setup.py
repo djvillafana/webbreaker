@@ -51,8 +51,8 @@ class PyTest(TestCommand):
 
 if sys.argv[-1] == 'secret':
     key = Fernet.generate_key()
-    with open(".webbreaker", 'wb') as secret_file:
-        secret_file.write(key)
+    with open(".webbreaker", 'w') as secret_file:
+        secret_file.write(key.decode())
     os.chmod('.webbreaker', 0o400)
     print("New secret has been set.")
     sys.exit(0)
@@ -61,8 +61,8 @@ if sys.argv[-1] == 'secret':
 if sys.argv[-1] == 'install':
     if not os.path.isfile('.webbreaker'):
         key = Fernet.generate_key()
-        with open(".webbreaker", 'wb') as secret_file:
-            secret_file.write(key)
+        with open(".webbreaker", 'w') as secret_file:
+            secret_file.write(key.decode())
         os.chmod('.webbreaker', 0o400)
 
     os.system('python setup.py install --user')
