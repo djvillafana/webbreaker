@@ -147,12 +147,12 @@ List all versions found on Fortify (using the url listed in fortify.ini) that be
 Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). User will be prompted for their username and password to authenticate to Fortify.
 **Note: When username/password authentication is successful, Fortify will provide a token that is valid for 24 hours. WebBreaker encryptes this token and stores it in fortify.ini. As long as you have a valid token, you will not be prompted for your username and password.**
 ```
-> webbreaker fortify upload --fortify_version important_site_auth -x fpr
+> webbreaker fortify upload --version important_site_auth -x fpr
 ```
 
 Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.
 ```
-> webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --fortify_version important_site_auth -x fpr
+> webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth -x fpr
 ```
 
 ## Configurations

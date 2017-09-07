@@ -419,14 +419,14 @@ def fortify_list(config, fortify_user, fortify_password, application):
 @fortify.command()
 @click.option('--fortify_user')
 @click.option('--fortify_password')
-@click.option('--fortify_version',
+@click.option('--version',
               required=True,
               help="Name of Fortify application version which you would like to upload a scan to.")
 @click.option('-x',
               required=True,
               help="Extension of scan file being uploaded")
 @pass_config
-def upload(config, fortify_user, fortify_password, fortify_version, x):
+def upload(config, fortify_user, fortify_password, version, x):
     fortify_config = FortifyConfig()
     try:
         if not fortify_user or not fortify_password:
@@ -436,7 +436,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
                                                project_template=fortify_config.project_template,
                                                application_name=fortify_config.application_name,
-                                               token=fortify_config.secret, scan_name=fortify_version, extension=x)
+                                               token=fortify_config.secret, scan_name=version, extension=x)
             else:
                 Logger.file_logr.debug("Fortify secret not found in fortify.ini")
                 fortify_user = click.prompt('Fortify user')
@@ -445,7 +445,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                                project_template=fortify_config.project_template,
                                                application_name=fortify_config.application_name,
                                                fortify_username=fortify_user,
-                                               fortify_password=fortify_password, scan_name=fortify_version,
+                                               fortify_password=fortify_password, scan_name=version,
                                                extension=x)
                 fortify_config.write_secret(fortify_client.token)
                 Logger.file_logr.debug("Fortify secret written to fortify.ini")
@@ -454,7 +454,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                            project_template=fortify_config.project_template,
                                            application_name=fortify_config.application_name,
                                            fortify_username=fortify_user,
-                                           fortify_password=fortify_password, scan_name=fortify_version, extension=x)
+                                           fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
             Logger.file_logr.debug("Fortify secret written to fortify.ini")
 
@@ -468,7 +468,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                            project_template=fortify_config.project_template,
                                            application_name=fortify_config.application_name,
                                            fortify_username=fortify_user,
-                                           fortify_password=fortify_password, scan_name=fortify_version, extension=x)
+                                           fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
             Logger.file_logr.debug("Fortify secret written to fortify.ini")
             Logger.file_logr.debug("Attempting to rerun 'fortify upload'")
