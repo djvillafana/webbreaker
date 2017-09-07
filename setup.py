@@ -6,7 +6,7 @@ import sys
 import os
 from setuptools.command.test import test as TestCommand
 from webbreaker import __version__ as version
-from Crypto.Hash import SHA256
+from cryptography.fernet import Fernet
 from datetime import datetime
 import base64
 
@@ -29,7 +29,7 @@ requires = ['click',
             'pyasn1',
             'pyfiglet>=0.7.5',
             'pyOpenSSL',
-            'pycrypto>=2.6.1',
+            'cryptography>=1.8.0',
             'webinspectapi>=1.0.15',
             'requests']
 
@@ -50,11 +50,9 @@ class PyTest(TestCommand):
 
 
 if sys.argv[-1] == 'secret':
-    now = datetime.now()
-    hasher = SHA256.new()
-    hasher.update(now.isoformat())
+    key = Fernet.generate_key()
     with open(".webbreaker", 'w') as secret_file:
-        secret_file.write(base64.b64encode(hasher.digest()))
+        secret_file.write(key.decode())
     os.chmod('.webbreaker', 0o400)
     print("New secret has been set.")
     sys.exit(0)
@@ -62,11 +60,9 @@ if sys.argv[-1] == 'secret':
 # build and install helper
 if sys.argv[-1] == 'install':
     if not os.path.isfile('.webbreaker'):
-        now = datetime.now()
-        hasher = SHA256.new()
-        hasher.update(now.isoformat())
+        key = Fernet.generate_key()
         with open(".webbreaker", 'w') as secret_file:
-            secret_file.write(base64.b64encode(hasher.digest()))
+            secret_file.write(key.decode())
         os.chmod('.webbreaker', 0o400)
 
     os.system('python setup.py install --user')
