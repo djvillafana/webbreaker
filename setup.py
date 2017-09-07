@@ -112,4 +112,5 @@ try:
         cmdclass={'test': PyTest}
     )
 finally:
-    set_secret()
+    if not os.path.isfile('.webbreaker'):
+        set_secret()
