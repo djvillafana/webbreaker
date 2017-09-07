@@ -119,21 +119,21 @@ The three (3) command-line usage examples illustrate the minimum _required_, _sc
 
 + Minimal WebBreaker command, setup.py needs to be ran once for installing python dependencies.  Your Python site-packages must be included in your PATH to run from the command-line locally.
 ```
-> webbreaker webinspect scan --settings=Default.xml
+> webbreaker webinspect scan --settings Default
 ```
 + WebBreaker command without the _`--settings`_ option, creating an authenitcated scan with no pre-determined scan values.
 ```
-> webbreaker webinspect scan --login_macro=some_login_macro --start_urls=example.com --scan_policy=Standard --scan_start=url --allowed_hosts=foo.example.com bar.example.com
+> webbreaker webinspect scan --login_macro some_login_macro --start_urls example.com --scan_policy Standard --scan_start url --allowed_hosts foo.example.com --allowed_hosts bar.example.com
 ```
 + Jenkins command-line with Shell plugin in Build or Post-Build task:
 ```
-> webbreaker webinspect scan --settings=Default.xml --scan_name=${BUILD_TAG}
+> webbreaker webinspect scan --settings Default --scan_name ${BUILD_TAG}
 ```
 
 ### Executing or Running WebBreaker ###
 
 ```
-webbreaker webinspect --url=https://some.webinspect.server.com --settings=MyCustomWebinspectSetting --scan_policy=Application --scan_name=some_scan_name
+webbreaker webinspect scan --settings MyCustomWebinspectSetting --scan_policy Application --scan_name some_scan_name
  _       __     __    ____                  __            
 | |     / /__  / /_  / __ )________  ____ _/ /_____  _____
 | | /| / / _ \/ __ \/ __  / ___/ _ \/ __ `/ //_/ _ \/ ___/
