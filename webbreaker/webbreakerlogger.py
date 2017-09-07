@@ -8,11 +8,10 @@ import sys
 import os
 
 
-FORMATTER = logging.Formatter('%(levelname)s: %(message)s')
+FORMATTER = logging.Formatter('%(message)s')
 DATETIME_SUFFIX = datetime.datetime.now().strftime("%m-%d-%Y-%H%M%S")
 APP_LOG = os.path.abspath(os.path.join('/tmp/', 'webbreaker-' + DATETIME_SUFFIX + '.log'))
 DEBUG_LOG = os.path.abspath(os.path.join('/tmp/', 'webbreaker-debug-' + DATETIME_SUFFIX + '.log'))
-SPLUNK_LOG = os.path.abspath(os.path.join('/tmp/', 'splunk-' + DATETIME_SUFFIX + '.log'))
 STOUT_LOG = os.path.abspath(os.path.join('/tmp', 'webbreaker-out' + DATETIME_SUFFIX + '.log'))
 
 
@@ -29,7 +28,8 @@ def singleton(cls):
 def get_console_logger():
     console_logger = logging.getLogger()
     console_logger.setLevel(logging.NOTSET)
-    #TODO: remove levelname from console_formatter
+
+    # Set-up the logging configs
     ch = logging.StreamHandler(stream=sys.stdout)
     ch.setFormatter(FORMATTER)
     # Only send stout INFO level messages
@@ -42,15 +42,11 @@ def get_console_logger():
 
 def get_app_logger(name=None):
     default = "__webbreaker__"
-    log_map = {"__webbreaker__": APP_LOG}
-
-    if name:
-        app_logger = logging.getLogger(name)
-    else:
-        app_logger = logging.getLogger(default)
+    logger_map = {"__webbreaker__": APP_LOG}
+    app_logger = logging.getLogger(default)
 
     formatter = logging.Formatter('%(asctime)s: %(name)s %(levelname)s(%(message)s')
-    fh = logging.FileHandler(log_map[name], 'a')
+    fh = logging.FileHandler(logger_map[name], mode='a')
     fh.setFormatter(formatter)
     app_logger.setLevel(logging.DEBUG)
     app_logger.addHandler(fh)
@@ -58,11 +54,10 @@ def get_app_logger(name=None):
 
 
 def get_debug_logger(name=None):
-    #log_map = {"__webbreaker_debug__": DEBUG_LOG}
     debug_logger = logging.getLogger(name)
     debug_logger.setLevel(logging.NOTSET)
-    debug_formatter = logging.Formatter('%(asctime)s: %(name)s %(levelname)s(%(message)s')
 
+    debug_formatter = logging.Formatter('%(asctime)s: %(name)s %(levelname)s(%(message)s')
     fh = logging.FileHandler(DEBUG_LOG, mode='a')
     fh.setFormatter(debug_formatter)
     fh.setLevel(logging.DEBUG)

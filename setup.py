@@ -15,8 +15,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
-
 requires = ['click',
             'configparser>=3.5.0',
             'dpath>=1.4.0',
