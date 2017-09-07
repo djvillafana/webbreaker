@@ -169,6 +169,94 @@ If an error occurs on behalf of the notifiers at any point during the process of
 
 Found something that doesn't seem right or have a feature request? [Please open a new issue](https://github.com/target/webbreaker/issues/new/).
 
+
+### Cheatsheet
+
+#### WebInspect List
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083
+```
+> python webbreaker webinspect list --server webinspect-server-1.example.com:8083
+```
+
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083 whose scan name matches the query 'important_site'
+```
+> webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site
+```
+
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083. Interaction with server will use http instead of https.
+```
+$ webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http
+```
+#### WebInspect Downlaod
+For these examples, assume the server has scans with names important_site_auth, important_site_api, important_site_internal
+
+Download the results from the important_site_auth scan found on webinspect-server-2.example.com:8083 as an fpr file
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth
+```
+
+Because multiple scan names on webinspect-server-2.example.com:8083 match 'important_site', this command will list them in output and no files will be downloaded
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site
+```
+
+Download the results of scan 'important_site_auth' from webinspect-server-2.example.com:8083 in xml format
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml
+```
+
+Download the results from the important_site_auth scan found on webinspect-server-2.example.com:8083 as an fpr file. All interaction with webinspect-server-2.example.com:8083 will use http instead of https
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http
+```
+
+#### WebInspect Scan
+
+Launch a scan using the settings file important_site_auth.xml (WebBreaker assumes the .xml extension)
+```
+> webbreaker webinspect scan --settings important_site_auth
+```
+
+Launch a scan using the settings file important_site_auth.xml (WebBreaker assumes the .xml extension) with the allowed hosts important-site.com and m.important-site.com
+**Note: The start_urls, allowed_hosts, and workflow_macros options can all be used multiple times in this format**
+```
+> webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com
+```
+
+#### Fortify List
+
+List all versions found on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.
+```
+> webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS
+```
+
+List all versions found on Fortify (using the url listed in fortify.ini). User will be prompted for their username and password to authenticate to Fortify.
+**Note: When username/password authentication is successful, Fortify will provide a token that is valid for 24 hours. WebBreaker encryptes this token and stores it in fortify.ini. As long as you have a valid token, you will not be prompted for your username and password.**
+```
+> webbreaker fortify list
+```
+
+List all versions found on Fortify (using the url listed in fortify.ini) that belong to the application 'webinspect'
+**Note: Fortify applications are also sometimes refered to as projects**
+```
+> webbreaker fortify list --application webinspect
+```
+
+#### Fortify Upload
+
+Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). User will be prompted for their username and password to authenticate to Fortify.
+**Note: When username/password authentication is successful, Fortify will provide a token that is valid for 24 hours. WebBreaker encryptes this token and stores it in fortify.ini. As long as you have a valid token, you will not be prompted for your username and password.**
+```
+> webbreaker fortify upload --fortify_version important_site_auth -x fpr
+```
+
+Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.
+```
+> webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --fortify_version important_site_auth -x fpr
+```
+
+
+
 ### Copyright and License
 
 * Copyright 2017 Target Brands, Inc.
