@@ -25,7 +25,7 @@ class FortifyClient(object):
             self.token = self.get_token()
 
         if not self.token:
-            Logger.file_logr.critical("Unable to obtain a Fortify API token.")
+            Logger.app.critical("Unable to obtain a Fortify API token.")
             raise ValueError("Unable to obtain a Fortify API token.")
 
     def get_token(self):
@@ -36,9 +36,9 @@ class FortifyClient(object):
                 token = response.data['data']['token']
                 return token
             else:
-                Logger.file_logr.critical(response.message)
+                Logger.app.critical(response.message)
         except Exception as e:
-            Logger.file_logr.critical("Exception while getting Fortify token: {0}".format(e.message))
+            Logger.app.critical("Exception while getting Fortify token: {0}".format(e.message))
 
         return None
 
@@ -88,12 +88,11 @@ class FortifyClient(object):
             response = api.commit_project_version(project_version_id=project_version_id)
             if not response.success:
                 raise ValueError("Failed to commit new project version")
-
-                Logger.file_logr.debug("Created new project version id {0}".format(project_version_id))
+                #Logger.app.debug("Created new project version id {0}".format(project_version_id))
             return project_version_id
 
         except Exception as e:
-            Logger.file_logr.critical("Exception trying to create project version. {0}".format(e.message))
+            Logger.app.critical("Exception trying to create project version. {0}".format(e.message))
 
         return None
 
@@ -120,7 +119,7 @@ class FortifyClient(object):
                     if project_version['project']['name'] == self.application_name:
                         if project_version['name'] == self.fortify_version:
                             # we have a matching project version
-                            Logger.file_logr.debug("Found existing project version {0}".format(project_version['id']))
+                            Logger.app.debug("Found existing project version {0}".format(project_version['id']))
                             return project_version['id']
                 # Didn't find a matching project version, verify that our project exists
                 for project_version in response.data['data']:
@@ -133,9 +132,9 @@ class FortifyClient(object):
                 # Avoid printing error for invalid token. Return -1 to reauth
                 return -1
             else:
-                Logger.file_logr.critical("Failed to get project version. {0}".format(response.message))
+                Logger.app.critical("Failed to get project version. {0}".format(response.message))
         except Exception as e:
-            Logger.file_logr.critical("Exception trying to get project version. {0}".format(e.message))
+            Logger.app.critical("Exception trying to get project version. {0}".format(e.message))
 
         return None
 
@@ -154,35 +153,35 @@ class FortifyClient(object):
                                                 project_version_id=project_version_id)
 
         if response.success:
-            Logger.file_logr.critical(
+            Logger.console.info(
                 "Your scan file {0}.{1}, has been successfully uploaded to {2}!".format(file_name,
                                                                                         self.extension,
                                                                                         self.ssc_server))
         elif not response.success and "401" in response.message:
             return response.response_code
         else:
-            Logger.file_logr.error("Error uploading {0}.{1}!!!".format(self.fortify_version, self.extension))
+            Logger.console.error("Error uploading {0}.{1}!!!".format(self.fortify_version, self.extension))
+            Logger.app.error("Error uploading {0}.{1}!!!".format(self.fortify_version, self.extension))
         return response
 
     def list_projects(self):
         api = FortifyApi(self.ssc_server, token=self.token, verify_ssl=False)
         response = api.get_projects()
         if response.success:
-            Logger.file_logr.critical("{0:^5} {1:30}".format('ID', 'Name'))
-            Logger.file_logr.critical("{0:5} {1:30}".format('-'*5, '-'*30))
+            Logger.console.info("{0:^5} {1:30}".format('ID', 'Name'))
+            Logger.console.info("{0:5} {1:30}".format('-'*5, '-'*30))
             for proj in response.data['data']:
-                Logger.file_logr.critical("{0:^5} {1:30}".format(proj['id'], proj['name']))
+                Logger.console.info("{0:^5} {1:30}".format(proj['id'], proj['name']))
         return None
-
 
     def list_versions(self):
         api = FortifyApi(self.ssc_server, token=self.token, verify_ssl=False)
         response = api.get_project_versions()
         if response.success:
-            Logger.file_logr.critical("{0:^5} {1:30}".format('ID', 'Name'))
-            Logger.file_logr.critical("{0:5} {1:30}".format('-'*5, '-'*30))
+            Logger.console.info("{0:^5} {1:30}".format('ID', 'Name'))
+            Logger.console.info("{0:5} {1:30}".format('-'*5, '-'*30))
             for version in response.data['data']:
-                Logger.file_logr.critical("{0:^5} {1:30}".format(version['id'], version['name']))
+                Logger.console.info("{0:^5} {1:30}".format(version['id'], version['name']))
         elif not response.success and "401" in response.message:
             return response.response_code
         return None
@@ -191,11 +190,11 @@ class FortifyClient(object):
         api = FortifyApi(self.ssc_server, token=self.token, verify_ssl=False)
         response = api.get_project_versions()
         if response.success:
-            Logger.file_logr.critical("{0:^5} {1:30}".format('ID', 'Name'))
-            Logger.file_logr.critical("{0:5} {1:30}".format('-' * 5, '-' * 30))
+            Logger.console.info("{0:^5} {1:30}".format('ID', 'Name'))
+            Logger.console.info("{0:5} {1:30}".format('-' * 5, '-' * 30))
             for version  in response.data['data']:
                 if version['project']['name'] == application:
-                    Logger.file_logr.critical("{0:^5} {1:30}".format(version['id'], version['name']))
+                    Logger.console.info("{0:^5} {1:30}".format(version['id'], version['name']))
         elif not response.success and "401" in response.message:
             return response.response_code
         return None

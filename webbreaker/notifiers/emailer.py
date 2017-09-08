@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 
 try:
@@ -37,7 +38,8 @@ class EmailNotifier(Notifier):
 
             mail_server.quit()
         except Exception as e:  # we don't want email failure to stop us, just log that it happened
-            Logger.file_logr.error("Problem sending email. {0}".format(e.message))
+            Logger.app.error("Error sending email. {}".format(e.message))
+            Logger.console.error("Error sending email, see log: {}".format(Logger.app_logfile))
 
     def __str__(self):
         return "EmailNotifier"

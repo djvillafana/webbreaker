@@ -33,7 +33,6 @@ from webbreaker.webbreakerlogger import Logger
 from webbreaker.webinspectconfig import WebInspectConfig
 from webbreaker.webinspectclient import WebinspectClient
 from webbreaker.webinspectqueryclient import WebinspectQueryClient
-#from webbreaker.webbreakerconfig import WebBreakerConfig
 from webbreaker.fortifyclient import FortifyClient
 from webbreaker.fortifyconfig import FortifyConfig
 
@@ -62,8 +61,8 @@ def cli(config, help):
 
     # Show something pretty to start
     f = Figlet(font='slant')
-    Logger.file_logr.critical("\n\n{0}Version {1}\n".format(f.renderText('WebBreaker'), version))
-    Logger.file_logr.critical("logging to file: {0}".format(Logger.file_logr.logfilepath))
+    Logger.console.info("\n\n{0}Version {1}\n".format(f.renderText('WebBreaker'), version))
+    Logger.console.info("Logging to files: {0} and {1}".format(Logger.app_logfile, Logger.app_debug_logfile))
     config.help = help
 
 
@@ -167,17 +166,17 @@ def scan(config, **kwargs):
     try:
         webinspect_config.fetch_webinspect_configs()
     except GitCommandError as e:
-        Logger.file_logr.critical("{} does not have permission to access the git repo: {}".format(
-            webinspect_config.webinspect_git, e))
+        Logger.console.critical("{} does not have permission to access the git repo, see log {}".format(
+            webinspect_config.webinspect_git, Logger.app_logfile))
+        Logger.app.critical("{} does not have permission to access the git repo: {}".format(
+        webinspect_config.webinspect_git, e))
 
     # ...and settings...
     try:
         webinspect_settings = webinspect_config.parse_webinspect_options(ops)
     except AttributeError as e:
-        Logger.file_logr.error("Your configuration or setting is incorrect {}!!!".format(e))
-
-
-
+        Logger.console.info("Your configuration or settings are incorrect see log {}!!!".format(Logger.app_logfile))
+        Logger.app.error("Your configuration or settings are incorrect see log {}!!!".format(e))
 
     # OK, we're ready to actually do something now
 
@@ -185,7 +184,8 @@ def scan(config, **kwargs):
     try:
         webinspect_client = WebinspectClient(webinspect_settings)
     except (UnboundLocalError, EnvironmentError) as e:
-        Logger.file_logr.critical("Incorrect WebInspect configurations found!! {}".format(str(e)))
+        Logger.console.critical("Incorrect WebInspect configurations found!! See log {}".format(str(Logger.app_logfile)))
+        Logger.app.critical("Incorrect WebInspect configurations found!! {}".format(str(e)))
         exit(1)
 
     # if a scan policy has been specified, we need to make sure we can find/use it
@@ -196,23 +196,24 @@ def scan(config, **kwargs):
         if str(webinspect_client.scan_policy).lower() in [str(x[0]).lower() for x in webinspect_config.mapped_policies]:
             idx = [x for x, y in enumerate(webinspect_config.mapped_policies) if y[0] == str(webinspect_client.scan_policy).lower()]
             policy_guid = webinspect_config.mapped_policies[idx[0]][1]
-            Logger.file_logr.debug("Provided scan_policy {} listed as builtin policyID {}".format(webinspect_client.scan_policy, policy_guid))
-            Logger.file_logr.debug("Checking to make sure a policy with that ID exists in WebInspect.")
+            Logger.console.info("Provided scan_policy {} listed as builtin policyID {}".format(webinspect_client.scan_policy, policy_guid))
+            Logger.console.info("Checking to make sure a policy with that ID exists in WebInspect.")
             if not webinspect_client.policy_exists(policy_guid):
                 Logger.file_logr.error(
                     "Scan policy {} cannot be located on server. Stopping".format(webinspect_client.scan_policy))
                 exit(1)
             else:
-                Logger.file_logr.debug("Found policy {} in WebInspect.".format(policy_guid))
+                Logger.console.info("Found policy {} in WebInspect.".format(policy_guid))
         else:
             # Not a builtin. Assume that caller wants the provided policy to be uploaded
-            Logger.file_logr.debug("Provided scan policy is not built-in, so will assume it needs to be uploaded.")
+            Logger.console.info("Provided scan policy is not built-in, so will assume it needs to be uploaded.")
             webinspect_client.upload_policy()
             policy = webinspect_client.get_policy_by_name(webinspect_client.scan_policy)
             if policy:
                 policy_guid = policy['uniqueId']
             else:
-                Logger.file_logr.error("Unable to locate uploaded policy. Make sure policy name matches policy file name.")
+                Logger.console.info("The policy name is either incorrect or it is not available in {}."
+                                    .format('etc/webinspect/policies'))
                 exit(1)
 
         # Change the provided policy name into the corresponding policy id for scan creation.
@@ -242,9 +243,9 @@ def scan(config, **kwargs):
             webinspect_client.wait_for_scan_status_change(scan_id)  # execution waits here, blocking call
 
         status = webinspect_client.get_scan_status(scan_id)
-        Logger.file_logr.critical("Scan status has changed to {0}.".format(status))
+        Logger.console.critical("Scan status has changed to {0}.".format(status))
         if status.lower() != 'complete':  # case insensitive comparison is tricky. this should be good enough for now
-            Logger.file_logr.critical('Status is not complete. This is unrecoverable. WebBreaker will exit.')
+            Logger.console.critical('Scan is incomplete and is unrecoverable. WebBreaker will exit!!')
             handle_scan_event('scan_end')
             exit(1)
 
@@ -252,13 +253,16 @@ def scan(config, **kwargs):
         webinspect_client.export_scan_results(scan_id, 'xml')
         handle_scan_event('scan_end')
 
-        Logger.file_logr.critical('Scan has finished.')
+        Logger.console.critical('Scan is complete.')
     except (requests.exceptions.ConnectionError, httplib.BadStatusLine, requests.exceptions.HTTPError) as e:
-        Logger.file_logr.error("Unable to connect to WebInspect {0}, see also: {1}".format(webinspect_settings['webinspect_url'], e))
+        Logger.console.error(
+            "Unable to connect to WebInspect {0}, see log: {1}".format(webinspect_settings['webinspect_url'],
+                                                                       Logger.app_logfile))
+        Logger.app.error(
+            "Unable to connect to WebInspect {0}, see also: {1}".format(webinspect_settings['webinspect_url'], e))
 
-    # Log the log to the log (LOL)...
     if scan_id:
-        Logger.file_logr.info("Scan log: {}".format(webinspect_client.get_scan_log(scan_guid=scan_id)))
+        Logger.app.info("Scan log: {}".format(webinspect_client.get_scan_log(scan_guid=scan_id)))
 
     # And wrap up by writing out the issues we found
     # this should be moved into a function...probably a whole 'nother class, tbh
@@ -276,7 +280,7 @@ def scan(config, **kwargs):
                     outfile.write(json.dumps(issue) + '\n')
 
     # That's it. We're done.
-    Logger.file_logr.critical("Webbreaker complete.")
+    Logger.console.critical("Webbreaker has completed.")
 
 
 @webinspect.command('list')
@@ -298,19 +302,18 @@ def webinspect_list(config, server, scan_name, protocol):
         if scan_name:
             results = query_client.get_scan_by_name(scan_name)
             if len(results):
-                Logger.file_logr.critical("Scans matching the name {} found.".format(scan_name))
-                Logger.file_logr.critical("{0:80} {1:40} {2:10}".format('Scan Name', 'Scan ID', 'Scan Status'))
-                Logger.file_logr.critical("{0:80} {1:40} {2:10}\n".format('-' * 80, '-' * 40, '-' * 10))
+                Logger.console.info("Scans matching the name {} found.".format(scan_name))
+                Logger.console.info("{0:80} {1:40} {2:10}".format('Scan Name', 'Scan ID', 'Scan Status'))
+                Logger.console.info("{0:80} {1:40} {2:10}\n".format('-' * 80, '-' * 40, '-' * 10))
                 for match in results:
-                    Logger.file_logr.critical(
+                    Logger.console.info(
                         "{0:80} {1:40} {2:10}".format(match['Name'], match['ID'], match['Status']))
             else:
-                Logger.file_logr.critical("No scans matching the name {} were found.".format(scan_name))
+                Logger.console.info("No scans matching the name {} were found.".format(scan_name))
         else:
             query_client.list_scans()
     except:
-        Logger.file_logr.critical("Unable to complete command 'webinspect list'")
-
+        Logger.console.info("Unable to complete command 'webinspect list'")
 
 
 @webinspect.command()
@@ -335,20 +338,20 @@ def download(config, server, scan_name, x, protocol):
     try:
         search_results = query_client.get_scan_by_name(scan_name)
         if len(search_results) == 0:
-            Logger.file_logr.critical("No scans matching the name {} where found on this host".format(scan_name))
+            Logger.console.info("No scans matching the name {} where found on this host".format(scan_name))
         elif len(search_results) == 1:
             scan_id = search_results[0]['ID']
-            Logger.file_logr.critical(
+            Logger.console.info(
                 "Scan matching the name {} found.\nDownloading scan {} ...".format(scan_name, scan_id))
             query_client.export_scan_results(scan_id, scan_name, x)
         else:
-            Logger.file_logr.critical("Multiple scans matching the name {} found.".format(scan_name))
-            Logger.file_logr.critical("{0:80} {1:40} {2:10}".format('Scan Name', 'Scan ID', 'Scan Status'))
-            Logger.file_logr.critical("{0:80} {1:40} {2:10}\n".format('-' * 80, '-' * 40, '-' * 10))
+            Logger.console.info("Multiple scans matching the name {} found.".format(scan_name))
+            Logger.console.info("{0:80} {1:40} {2:10}".format('Scan Name', 'Scan ID', 'Scan Status'))
+            Logger.console.info("{0:80} {1:40} {2:10}\n".format('-' * 80, '-' * 40, '-' * 10))
             for result in search_results:
-                Logger.file_logr.critical("{0:80} {1:40} {2:10}".format(result['Name'], result['ID'], result['Status']))
+                Logger.console.info("{0:80} {1:40} {2:10}".format(result['Name'], result['ID'], result['Status']))
     except:
-        Logger.file_logr.critical("Unable to complete command 'webinspect download'")
+        Logger.console.info("Unable to complete command 'webinspect download'")
 
 
 @cli.group(help="""Collaborative web application for managing WebInspect and Fortify SCA security bugs
@@ -370,54 +373,54 @@ def fortify_list(config, fortify_user, fortify_password, application):
     fortify_config = FortifyConfig()
     try:
         if not fortify_user or not fortify_password:
-            Logger.file_logr.debug("No Fortify username or password provided. Checking fortify.ini for secret")
+            Logger.console.info("No Fortify username or password provided. Checking fortify.ini for secret")
             if fortify_config.secret:
-                Logger.file_logr.debug("Fortify secret found in fortify.ini")
+                Logger.console.info("Fortify secret found in fortify.ini")
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url, token=fortify_config.secret)
             else:
-                Logger.file_logr.debug("Fortify secret not found in fortify.ini")
+                Logger.console.info("Fortify secret not found in fortify.ini")
                 fortify_user = click.prompt('Fortify user')
                 fortify_password = click.prompt('Fortify password', hide_input=True)
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url, fortify_username=fortify_user,
                                                fortify_password=fortify_password)
                 fortify_config.write_secret(fortify_client.token)
-                Logger.file_logr.debug("Fortify secret written to fortify.ini")
+                Logger.console.info("Fortify secret written to fortify.ini")
             if application:
                 reauth = fortify_client.list_application_versions(application)
                 if reauth == -1 and fortify_config.secret:
-                    Logger.file_logr.debug("Fortify secret invalid...reauthorizing")
+                    Logger.console.info("Fortify secret invalid...reauthorizing")
                     fortify_user = click.prompt('Fortify user')
                     fortify_password = click.prompt('Fortify password', hide_input=True)
                     fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url, fortify_username=fortify_user,
                                                    fortify_password=fortify_password)
                     fortify_config.write_secret(fortify_client.token)
-                    Logger.file_logr.debug("Fortify secret written to fortify.ini")
-                    Logger.file_logr.debug("Attempting to rerun 'fortify list --application'")
+                    Logger.console.info("Fortify secret written to fortify.ini")
+                    Logger.console.info("Attempting to rerun 'fortify list --application'")
                     fortify_client.list_application_versions(application)
             else:
                 reauth = fortify_client.list_versions()
                 if reauth == -1 and fortify_config.secret:
-                    Logger.file_logr.debug("Fortify secret invalid...reauthorizing")
+                    Logger.console.info("Fortify secret invalid...reauthorizing")
                     fortify_user = click.prompt('Fortify user')
                     fortify_password = click.prompt('Fortify password', hide_input=True)
                     fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url, fortify_username=fortify_user,
                                                    fortify_password=fortify_password)
                     fortify_config.write_secret(fortify_client.token)
-                    Logger.file_logr.debug("Fortify secret written to fortify.ini")
-                    Logger.file_logr.debug("Attempting to rerun 'fortify list'")
+                    Logger.console.info("Fortify secret written to fortify.ini")
+                    Logger.console.info("Attempting to rerun 'fortify list'")
                     fortify_client.list_versions()
         else:
             fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url, fortify_username=fortify_user,
                                            fortify_password=fortify_password)
             fortify_config.write_secret(fortify_client.token)
-            Logger.file_logr.debug("Fortify secret written to fortify.ini")
+            Logger.console.info("Fortify secret written to fortify.ini")
             if application:
                 fortify_client.list_application_versions(application)
             else:
                 fortify_client.list_versions()
 
     except:
-        Logger.file_logr.critical("Unable to complete command 'fortify list'")
+        Logger.console.critical("Unable to complete command 'fortify list'")
 
 
 @fortify.command()
@@ -443,15 +446,15 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
         scan_name = version
     try:
         if not fortify_user or not fortify_password:
-            Logger.file_logr.debug("No Fortify username or password provided. Checking fortify.ini for secret")
+            Logger.console.info("No Fortify username or password provided. Checking fortify.ini for secret")
             if fortify_config.secret:
-                Logger.file_logr.debug("Fortify secret found in fortify.ini")
+                Logger.console.info("Fortify secret found in fortify.ini")
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
                                                project_template=fortify_config.project_template,
                                                application_name=fortify_config.application_name,
                                                token=fortify_config.secret, scan_name=version, extension=x)
             else:
-                Logger.file_logr.debug("Fortify secret not found in fortify.ini")
+                Logger.console.info("Fortify secret not found in fortify.ini")
                 fortify_user = click.prompt('Fortify user')
                 fortify_password = click.prompt('Fortify password', hide_input=True)
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
@@ -461,7 +464,7 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
                                                fortify_password=fortify_password, scan_name=version,
                                                extension=x)
                 fortify_config.write_secret(fortify_client.token)
-                Logger.file_logr.debug("Fortify secret written to fortify.ini")
+                Logger.console.info("Fortify secret written to fortify.ini")
         else:
             fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
                                            project_template=fortify_config.project_template,
@@ -469,7 +472,7 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
                                            fortify_username=fortify_user,
                                            fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
-            Logger.file_logr.debug("Fortify secret written to fortify.ini")
+            Logger.console.info("Fortify secret written to fortify.ini")
 
         reauth = fortify_client.upload_scan(file_name=scan_name)
 
@@ -478,7 +481,7 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
             Logger.file_logr.critical("Fortify Application {} does not exist. Unable to upload scan.".format(application))
 
         if reauth == -1 and fortify_config.secret:
-            Logger.file_logr.debug("Fortify secret invalid...reauthorizing")
+            Logger.console.info("Fortify secret invalid...reauthorizing")
             fortify_user = click.prompt('Fortify user')
             fortify_password = click.prompt('Fortify password', hide_input=True)
             fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
@@ -487,16 +490,17 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
                                            fortify_username=fortify_user,
                                            fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
-            Logger.file_logr.debug("Fortify secret written to fortify.ini")
-            Logger.file_logr.debug("Attempting to rerun 'fortify upload'")
+
+            Logger.console.info("Fortify secret written to fortify.ini")
+            Logger.console.info("Attempting to re-run 'fortify upload'")
             app_error = fortify_client.upload_scan(file_name=scan_name)
 
             if app_error == -2:
                 # The given application doesn't exist
-                Logger.file_logr.critical(
+                Logger.console.critical(
                     "Fortify Application {} does not exist. Unable to upload scan.".format(application))
     except:
-        Logger.file_logr.critical("Unable to complete command 'fortify upload'")
+        Logger.console.critical("Unable to complete command 'fortify upload'")
 
 
 if __name__ == '__main__':

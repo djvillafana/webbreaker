@@ -46,7 +46,7 @@ def formatted_settings_payload(settings, scan_name, runenv, scan_mode, scan_scop
             json_scan_settings['overrides']['scanScope'] = 'Ancestors'
         else:
             #json_scan_settings['overrides']['scanScope'] = 'None'
-            Logger.file_logr.error("Usage: all, strict, children, or ancestors are options! \n"
+            Logger.app.error("Usage: all, strict, children, or ancestors are options! \n"
                          "The value {} for scan_scope is not available!".format(scan_scope))
 
     if login_macro:
@@ -62,7 +62,7 @@ def formatted_settings_payload(settings, scan_name, runenv, scan_mode, scan_scop
         elif scan_start == "macro":
             json_scan_settings['overrides']['startOption'] = "Macro"
         else:
-            Logger.file_logr.error("usage: url or macro are options NOT scan_start: {}!".format(scan_start))
+            Logger.app.error("usage: url or macro are options NOT scan_start: {}!".format(scan_start))
 
     if start_urls:
         json_scan_settings['overrides']['startUrls'] = start_urls

@@ -16,7 +16,7 @@ requests.packages.urllib3.disable_warnings()
 class WebinspectQueryClient(object):
     def __init__(self, host, protocol):
         self.host = protocol + '://' + host
-        Logger.file_logr.debug("WebinspectQueryClient created for host: {}".format(self.host))
+        Logger.console.info("Using webinspect server: -->{}<-- for query".format(self.host))
 
     def get_scan_by_name(self, scan_name):
         """
@@ -34,7 +34,7 @@ class WebinspectQueryClient(object):
         :return:
         """
         # Export scan as a xml for Threadfix or other Vuln Management System
-        Logger.file_logr.debug('Exporting scan: {}'.format(scan_id))
+        Logger.app.debug('Exporting scan: {}'.format(scan_id))
         detail_type = 'Full' if extension == 'xml' else None
         api = webinspectapi.WebInspectApi(self.host, verify_ssl=False)
         response = api.export_scan_format(scan_id, extension, detail_type)
@@ -42,14 +42,13 @@ class WebinspectQueryClient(object):
         if response.success:
             try:
                 with open('{0}.{1}'.format(scan_name, extension), 'wb') as f:
-                    Logger.file_logr.critical('Scan results file is available: {0}.{1}'.format(scan_name, extension))
+                    Logger.console.info('Scan results file is available: {0}.{1}'.format(scan_name, extension))
                     f.write(response.data)
             except UnboundLocalError as e:
-                Logger.file_logr.error('Error saving file locally {}'.format(e))
+                Logger.app.error('Error saving file locally {}'.format(e))
+                Logger.console.error('Error saving file locally see log: {}'.format(Logger.app_logfile))
         else:
-            Logger.file_logr.error('Unable to retrieve scan results. {} '.format(response.message))
-
-
+            Logger.app.error('Unable to retrieve scan results. {} '.format(response.message))
 
     def list_scans(self):
         """
@@ -61,7 +60,7 @@ class WebinspectQueryClient(object):
         response = api.list_scans()
         if response.success:
             for scan in response.data:
-                Logger.file_logr.critical("{0:80} {1:40} {2:10}".format(scan['Name'], scan['ID'], scan['Status']))
+                Logger.console.info("{0:80} {1:40} {2:10}".format(scan['Name'], scan['ID'], scan['Status']))
         else:
-            Logger.file_logr.critical("{}".format(response.message))
+            Logger.app.critical("{}".format(response.message))
 

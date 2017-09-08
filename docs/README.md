@@ -10,6 +10,8 @@
 - [Installation: `installation`](#installation)
 - [Supported Features `supported_features`](#supported-features)
 - [Usage](#usage)
+- [Logging](#logging)
+- [Notifications](#notification)
 - [Verbose Cheatsheet](#verbose_cheatsheet)
 
 [Configurations](#configurations)
@@ -71,6 +73,16 @@ Webbreak utilizes a structure of upper-level and lower-level commands to enable 
 A promper Webbreaker command utilizes the structure 'webbreaker [webinspect|fortify] [lower-level command] [OPTIONS]'
 
 ### Verbose Cheatsheet
+
+## Logging
+WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
+
+## Notifications
+WebBreaker provides notifications for start-scan and end-scan events. A simple publisher/subscriber pattern is implemented under the ```webbreaker/notifiers```.  A Reporter object will hold a collection of Notifiers, each of which implements a Notify function responsible for creating the desired notification. Currently, two notification types are implemented email and database.
+
+The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
+
+If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
 
 #### WebInspect List
 List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083
@@ -169,6 +181,17 @@ Upload the file auth_scan.fpr to the important_site_auth version on Fortify
 ```
 > webbreaker fortify upload --version important_site_auth --scan_name auth_scan
 ```
+
+## Logging
+WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
+
+## Notifications
+WebBreaker provides notifications for start-scan and end-scan events. A simple publisher/subscriber pattern is implemented under the ```webbreaker/notifiers```.  A Reporter object will hold a collection of Notifiers, each of which implements a Notify function responsible for creating the desired notification. Currently, two notification types are implemented email and database.
+
+The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
+
+If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
+
 ## Configurations
 
 ### Fortify Configuration: `fortify_config`
@@ -185,7 +208,6 @@ project_template=Prioritized High Risk Issue Template
 application_name=WEBINSPECT
 fortify_secret=XXX
 ```
-
 
 ### WebInspect Configuration: `webinspect_config`
 WebInspect scan configuration files for `settings`, `policies`, and `webmacros` are versioned and hosted from a GIT repository determined in `webbreaker/etc/webinspect.ini`.  Additionally, all WebInspect policies and servers are managed from this configuration file.  The section `[api endpoints]` provides a _Just-In-Time_ (JIT) scheduler or the ability to load balance scans amongst a WebInspect cluster.

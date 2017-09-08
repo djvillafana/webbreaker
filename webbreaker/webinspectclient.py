@@ -43,20 +43,20 @@ class WebinspectClient(object):
         self.scan_size = webinspect_setting['webinspect_scan_size']
         self.runenv = WebBreakerHelper.check_run_env()
 
-        Logger.file_logr.debug("url: {}".format(self.url))
-        Logger.file_logr.debug("settings: {}".format(self.settings))
-        Logger.file_logr.debug("scan_name: {}".format(self.scan_name))
-        Logger.file_logr.debug("upload_settings: {}".format(self.webinspect_upload_settings))
-        Logger.file_logr.debug("upload_policy: {}".format(self.webinspect_upload_policy))
-        Logger.file_logr.debug("upload_webmacros: {}".format(self.webinspect_upload_webmacros))
-        Logger.file_logr.debug("workflow_macros: {}".format(self.workflow_macros))
-        Logger.file_logr.debug("allowed_hosts: {}".format(self.allowed_hosts))
-        Logger.file_logr.debug("scan_mode: {}".format(self.scan_mode))
-        Logger.file_logr.debug("scan_scope: {}".format(self.scan_scope))
-        Logger.file_logr.debug("login_macro: {}".format(self.login_macro))
-        Logger.file_logr.debug("scan_policy: {}".format(self.scan_policy))
-        Logger.file_logr.debug("scan_start: {}".format(self.scan_start))
-        Logger.file_logr.debug("start_urls: {}".format(self.start_urls))
+        Logger.console.debug("url: {}".format(self.url))
+        Logger.console.debug("settings: {}".format(self.settings))
+        Logger.console.debug("scan_name: {}".format(self.scan_name))
+        Logger.console.debug("upload_settings: {}".format(self.webinspect_upload_settings))
+        Logger.console.debug("upload_policy: {}".format(self.webinspect_upload_policy))
+        Logger.console.debug("upload_webmacros: {}".format(self.webinspect_upload_webmacros))
+        Logger.console.debug("workflow_macros: {}".format(self.workflow_macros))
+        Logger.console.debug("allowed_hosts: {}".format(self.allowed_hosts))
+        Logger.console.debug("scan_mode: {}".format(self.scan_mode))
+        Logger.console.debug("scan_scope: {}".format(self.scan_scope))
+        Logger.console.debug("login_macro: {}".format(self.login_macro))
+        Logger.console.debug("scan_policy: {}".format(self.scan_policy))
+        Logger.console.debug("scan_start: {}".format(self.scan_start))
+        Logger.console.debug("start_urls: {}".format(self.start_urls))
 
     def __settings_exists__(self):
         try:
@@ -69,8 +69,8 @@ class WebinspectClient(object):
                         return True
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("Unable to determine if settings exist {}".format(e))
-            Logger.file_logr.error("Will proceed as though settings do NOT exist on webinspect server.")
+            Logger.app.error("Unable to determine if setting file exists {}".format(e))
+            Logger.console.error("Unable to determine if setting file exists, scan will continue without setting!")
 
         return False
 
@@ -90,15 +90,14 @@ class WebinspectClient(object):
         response = api.create_scan(overrides)
 
         logger_response = json.dumps(response, default=lambda o: o.__dict__, sort_keys=True)
-        Logger.file_logr.info("Request sent to {0}:\n{1}".format(self.url, overrides))
-        Logger.file_logr.info("Response from {0}:\n{1}".format(self.url, logger_response))
+        Logger.app.info("Request sent to {0}:\n{1}".format(self.url, overrides))
+        Logger.app.info("Response from {0}:\n{1}".format(self.url, logger_response))
 
         if response.success:
             scan_id = response.data['ScanId']
-            #TODO: Change to appropriate log level, such as logger.info
-            Logger.file_logr.critical('WebInspect scan launched on {0} your scan id: {1} !!\n'.format(self.url, scan_id))
+            Logger.console.info('WebInspect scan launched on {0} your scan id: {1} !!\n'.format(self.url, scan_id))
         else:
-            Logger.file_logr.error("No scan was launched! {}".format(response.message))
+            Logger.app.error("No scan was launched! {}".format(response.message))
             return False
 
         return scan_id
@@ -110,7 +109,7 @@ class WebinspectClient(object):
         :return:
         """
         # Export scan as a xml for Threadfix or other Vuln Management System
-        Logger.file_logr.debug('Exporting scan: {} as {}'.format(scan_id, extension))
+        Logger.console.debug('Exporting scan: {} as {}'.format(scan_id, extension))
         detail_type = 'Full' if extension == 'xml' else None
         api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
         response = api.export_scan_format(scan_id, extension, detail_type)
@@ -118,13 +117,12 @@ class WebinspectClient(object):
         if response.success:
             try:
                 with open('{0}.{1}'.format(self.scan_name, extension), 'wb') as f:
-                    Logger.file_logr.critical('Scan results file is available: {0}.{1}'.format(self.scan_name, extension))
+                    Logger.console.info('Scan results file is available: {0}.{1}'.format(self.scan_name, extension))
                     f.write(response.data)
             except UnboundLocalError as e:
-                Logger.file_logr.error('Error saving file locally {}'.format(e))
+                Logger.app.error('Error saving file locally {}'.format(e))
         else:
-            Logger.file_logr.error('Unable to retrieve scan results. {} '.format(response.message))
-
+            Logger.app.error('Unable to retrieve scan results. {} '.format(response.message))
 
     def get_policy_by_guid(self, policy_guid):
         api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
@@ -151,7 +149,7 @@ class WebinspectClient(object):
                 if response.success:
                     scan_guid = response.data[0]['ID']
                 else:
-                    Logger.file_logr.error(response.message)
+                    Logger.app.error(response.message)
                     return None
 
             api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
@@ -161,7 +159,7 @@ class WebinspectClient(object):
             else:
                 return None
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("get_scan_issues failed: {}".format(e))
+            Logger.app.error("get_scan_issues failed: {}".format(e))
 
     def get_scan_log(self, scan_name=None, scan_guid=None):
         try:
@@ -172,7 +170,7 @@ class WebinspectClient(object):
                 if response.success:
                     scan_guid = response.data[0]['ID']
                 else:
-                    Logger.file_logr.error(response.message)
+                    Logger.app.error(response.message)
                     return None
 
             api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
@@ -182,7 +180,7 @@ class WebinspectClient(object):
             else:
                 return None
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("get_scan_log failed: {}".format(e))
+            Logger.app.error("get_scan_log failed: {}".format(e))
 
     def get_scan_status(self, scan_guid):
         api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
@@ -191,7 +189,7 @@ class WebinspectClient(object):
             status = json.loads(response.data_json())['ScanStatus']
             return status
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("get_scan_status failed: {}".format(e))
+            Logger.app.error("get_scan_status failed: {}".format(e))
             return "Unknown"
 
     def list_policies(self):
@@ -201,12 +199,12 @@ class WebinspectClient(object):
 
             if response.success:
                 for policy in response.data:
-                    Logger.file_logr.info("{}".format(policy))
+                    Logger.console.info("{}".format(policy))
             else:
-                Logger.file_logr.info("{}".format(response.message))
+                Logger.app.error("{}".format(response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("list_policies failed: {}".format(e))
+            Logger.app.error("list_policies failed: {}".format(e))
 
     def list_scans(self):
 
@@ -216,12 +214,12 @@ class WebinspectClient(object):
 
             if response.success:
                 for scan in response.data:
-                    Logger.file_logr.info("{}".format(scan))
+                    Logger.console.info("{}".format(scan))
             else:
-                Logger.file_logr.info("{}".format(response.message))
+                Logger.app.error("{}".format(response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("list_scans failed: {}".format(e))
+            Logger.app.error("list_scans failed: {}".format(e))
 
     def list_webmacros(self):
         try:
@@ -230,12 +228,12 @@ class WebinspectClient(object):
 
             if response.success:
                 for webmacro in response.data:
-                    Logger.file_logr.info("{}".format(webmacro))
+                    Logger.console.info("{}".format(webmacro))
             else:
-                Logger.file_logr.info("{}".format(response.message))
+                Logger.app.error("{}".format(response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("list_webmacros failed: {}".format(e))
+            Logger.app.error("list_webmacros failed: {}".format(e))
 
     def policy_exists(self, policy_guid):
         # true if policy exists
@@ -259,22 +257,22 @@ class WebinspectClient(object):
                 api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
                 response = api.delete_policy(response.data['uniqueId'])
                 if response.success:
-                    Logger.file_logr.debug("Deleted policy {} from server".format(ntpath.basename(self.webinspect_upload_policy).split('.')[0]))
+                    Logger.console.debug("Deleted policy {} from server".format(ntpath.basename(self.webinspect_upload_policy).split('.')[0]))
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("check/deletion of existing policy failed: {}".format(e))
+            Logger.app.error("Verify if deletion of existing policy failed: {}".format(e))
 
         try:
             api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
             response = api.upload_policy(self.webinspect_upload_policy)
 
             if response.success:
-                Logger.file_logr.debug("Uploaded policy {} to server.".format(self.webinspect_upload_policy))
+                Logger.console.debug("Uploaded policy {} to server.".format(self.webinspect_upload_policy))
             else:
-                Logger.file_logr.error("Error uploading policy {0}. {1}".format(self.webinspect_upload_policy,
+                Logger.app.error("Error uploading policy {0}. {1}".format(self.webinspect_upload_policy,
                                                                       response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("Error uploading policy {}".format(e))
+            Logger.app.error("Error uploading policy {}".format(e))
 
     def upload_settings(self):
 
@@ -283,13 +281,13 @@ class WebinspectClient(object):
             response = api.upload_settings(self.webinspect_upload_settings)
 
             if response.success:
-                Logger.file_logr.debug("Uploaded settings {} to server.".format(self.webinspect_upload_settings))
+                Logger.console.debug("Uploaded settings {} to server.".format(self.webinspect_upload_settings))
             else:
-                Logger.file_logr.error("Error uploading settings {0}. {1}".format(self.webinspect_upload_settings,
+                Logger.app.error("Error uploading settings {0}. {1}".format(self.webinspect_upload_settings,
                                                                         response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("Error uploading settings {}".format(e))
+            Logger.app.error("Error uploading settings {}".format(e))
 
     def upload_webmacros(self):
         try:
@@ -297,12 +295,12 @@ class WebinspectClient(object):
                 api = webinspectapi.WebInspectApi(self.url, verify_ssl=False)
                 response = api.upload_webmacro(webmacro)
                 if response.success:
-                    Logger.file_logr.debug("Uploaded webmacro {} to server.".format(webmacro))
+                    Logger.console.debug("Uploaded webmacro {} to server.".format(webmacro))
                 else:
-                    Logger.file_logr.error("Error uploading webmacro {0}. {1}".format(webmacro, response.message))
+                    Logger.app.error("Error uploading webmacro {0}. {1}".format(webmacro, response.message))
 
         except (ValueError, UnboundLocalError) as e:
-            Logger.file_logr.error("Error uploading webmacro {}".format(e))
+            Logger.app.error("Error uploading webmacro {}".format(e))
 
     def wait_for_scan_status_change(self, scan_id):
         """
@@ -315,6 +313,6 @@ class WebinspectClient(object):
         response = api.wait_for_status_change(scan_id)  # this line is the blocker
 
         if response.success:
-            Logger.file_logr.debug('Scan status {}'.format(response.data))
+            Logger.console.debug('Scan status {}'.format(response.data))
         else:
-            Logger.file_logr.debug('Scan status not known because: {}'.format(response.message))
+            Logger.app.debug('Scan status not known because: {}'.format(response.message))
