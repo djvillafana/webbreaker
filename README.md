@@ -57,7 +57,9 @@ Usage:
 
     WEBINSPECT SCAN OPTIONS:
       --settings            WebInspect scan configuration file, if no setting file is specified the ```Default``` file
-                            shipped with WebInspect will be used.
+                            shipped with WebInspect will be used. If used WebBreaker will by default check for your file
+                            in the repo downloaded from webinspect.ini. If your file is not in that repo, you may instead pass
+                            this option an absolute file path to your file. Ex) --settings Users/Matt/Documents/my_settings_file.xml
       --scan_name           Used for the command 'webinspect scan' as both a scan instance variable and file name.  Default value is
                             _`WEBINSPECT-<random-5-alpha-numerics>`, or Jenkins global
                             environment variables may be declared, such as $BUILD_TAG.
@@ -127,6 +129,7 @@ Usage:
 | ------------------- | ------- |
 | _Basic Scan_ | `webbreaker webinspect scan --settings important_site_auth` |
 | _Scan using multiple of same option_ | `webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com` |
+| _Scan using absolute settings path_ | `webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml` |
 
 |  | Fortify List Commands |
 | ------------------- | ------- |

@@ -123,6 +123,11 @@ Launch a scan using the settings file important_site_auth.xml (WebBreaker assume
 > webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com
 ```
 
+Launch a scan using a settings file found by absolute path instead of one downloaded from the webinspect.ini repo
+```
+> webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml
+```
+
 #### Fortify List
 
 List all versions found on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.

@@ -83,8 +83,9 @@ def webinspect(config):
                 type=str,
                 default='Default',
                 required=True,
-                help="Specify name of settings file, without the .xml extension,"
-                   " under the webbreaker/etc/webinspect/settings directory --settings=")
+                help="""Specify name of settings file, without the .xml extension. WebBreaker will 
+                 by default try to locate this file in in the repo found in webinspect.ini. If your 
+                 file is not in the repo, you may instead pass an absolute path to the file""")
 @click.option('--size',
               required=False,
               type=click.Choice(['medium', 'large']),
