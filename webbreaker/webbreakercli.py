@@ -161,11 +161,6 @@ def scan(config, **kwargs):
     ops['allowed_hosts'] = list(kwargs['allowed_hosts'])
     ops['workflow_macros'] = list(kwargs['workflow_macros'])
 
-    # ...and settings...
-    try:
-        webinspect_settings = webinspect_config.parse_webinspect_options(ops)
-    except AttributeError as e:
-        Logger.file_logr.error("Your configuration or setting is incorrect {}!!!".format(e))
 
     # ...as well as pulling down webinspect server config files from github...
     try:
@@ -173,6 +168,14 @@ def scan(config, **kwargs):
     except GitCommandError as e:
         Logger.file_logr.critical("{} does not have permission to access the git repo: {}".format(
             webinspect_config.webinspect_git, e))
+
+    # ...and settings...
+    try:
+        webinspect_settings = webinspect_config.parse_webinspect_options(ops)
+    except AttributeError as e:
+        Logger.file_logr.error("Your configuration or setting is incorrect {}!!!".format(e))
+
+
 
 
     # OK, we're ready to actually do something now

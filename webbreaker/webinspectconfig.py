@@ -119,15 +119,14 @@ class WebInspectConfig(object):
 
         if options['upload_settings']:
             try:
-                options['upload_scan_settings'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                                            'webbreaker', 'etc', 'webinspect',
-                                                                            'settings',
-                                                                            options['upload_settings'])))
+                options['upload_scan_settings'] = str("{}".format(os.path.join(os.path.dirname(__file__),
+                                                                   self.webinspect_dir, 'settings',
+                                                                   options['upload_settings'] + '.xml')))
             except (AttributeError, TypeError) as e:
                 Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_settings'], e))
         else:
-            options['upload_settings'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                                   'webbreaker', 'etc', 'webinspect', 'settings',
+            options['upload_settings'] = str("{}".format(os.path.join(os.path.dirname(__file__),
+                                                                   self.webinspect_dir, 'settings',
                                                                    options['settings'] + '.xml')))
 
         # if login macro has been specified, ensure it's uploaded.
@@ -153,22 +152,22 @@ class WebInspectConfig(object):
             try:
                 # trying to be clever, remove any duplicates from our upload list
                 options['upload_webmacros'] = list(set(options['upload_webmacros']))
-                options['upload_webmacros'] = [str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                                         'webbreaker', 'etc', 'webinspect', 'webmacros',
-                                                                         webmacro + '.webmacro'))) for webmacro in
+                options['upload_webmacros'] = [str("{}".format(os.path.join(os.path.dirname(__file__),
+                                                               self.webinspect_dir, 'webmacros',
+                                                               webmacro + '.webmacro'))) for webmacro in
                                             options['upload_webmacros']]
             except (AttributeError, TypeError) as e:
                 Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_webmacros'], e))
 
         # if upload_policy provided explicitly, follow that. otherwise, default to scan_policy if provided
         if options['upload_policy']:
-            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                                 'webbreaker', 'etc', 'webinspect', 'policies',
-                                                                 options['upload_policy'] + '.policy')))
+            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(__file__),
+                                                       self.webinspect_dir, 'policies',
+                                                       options['upload_policy'] + '.policy')))
         elif options['scan_policy']:
-            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                                 'webbreaker', 'etc', 'webinspect', 'policies',
-                                                                 options['scan_policy'] + '.policy')))
+            options['upload_policy'] = str("{}".format(os.path.join(os.path.dirname(__file__),
+                                                       self.webinspect_dir, 'policies',
+                                                       options['scan_policy'] + '.policy')))
 
         # Determine the targets specified in a settings file
         targets = self.__getScanTargets__(options['upload_settings'])
@@ -201,15 +200,16 @@ class WebInspectConfig(object):
         return webinspect_dict
 
     def fetch_webinspect_configs(self):
+        full_path = os.path.join(os.path.dirname(__file__), self.webinspect_dir)
         try:
-            if not os.path.isdir(self.webinspect_dir):
+            if not os.path.isdir(full_path):
                 Logger.file_logr.info(
                     "\n--------------------------------------------------------------------------------------"
                     "------------------------------------\n"
                     "Getting ALL of the WebInspect configurations from {}\n"
                     "---------------------------------------------------------------------------------------"
-                        .format(self.webinspect_git))
-                Repo.clone_from(self.webinspect_git, self.webinspect_dir)
+                        .format(full_path))
+                Repo.clone_from(self.webinspect_git, full_path)
 
             else:
                 Logger.file_logr.info(
@@ -218,8 +218,8 @@ class WebInspectConfig(object):
                     "Updating your WebInspect configurations from {}\n"
                     "---------------------------------------------------------------------------------------"
                     "-----------------------------------\n"
-                        .format(self.webinspect_git))
-                repo = Repo.init(self.webinspect_dir)
+                        .format(full_path))
+                repo = Repo.init(full_path)
                 repo.git.reset('--hard')
                 repo.remotes.origin.pull()
         # TODO: Need an exit here
