@@ -159,6 +159,11 @@ Upload the file important_site_auth.fpr to the important_site_auth version under
 ```
 > webbreaker fortify upload --application my_other_app --version important_site_auth
 ```
+
+Upload the file auth_scan.fpr to the important_site_auth version on Fortify
+```
+> webbreaker fortify upload --version important_site_auth --scan_name auth_scan
+```
 ## Configurations
 
 ### Fortify Configuration: `fortify_config`
