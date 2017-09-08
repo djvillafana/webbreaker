@@ -82,8 +82,9 @@ def webinspect(config):
                 type=str,
                 default='Default',
                 required=True,
-                help="Specify name of settings file, without the .xml extension,"
-                   " under the webbreaker/etc/webinspect/settings directory --settings=")
+                help="""Specify name of settings file, without the .xml extension. WebBreaker will 
+                 by default try to locate this file in in the repo found in webinspect.ini. If your 
+                 file is not in the repo, you may instead pass an absolute path to the file""")
 @click.option('--size',
               required=False,
               type=click.Choice(['medium', 'large']),
@@ -160,12 +161,6 @@ def scan(config, **kwargs):
     ops['allowed_hosts'] = list(kwargs['allowed_hosts'])
     ops['workflow_macros'] = list(kwargs['workflow_macros'])
 
-    # ...and settings...
-    try:
-        webinspect_settings = webinspect_config.parse_webinspect_options(ops)
-    except AttributeError as e:
-        Logger.console.info("Your configuration or settings are incorrect see log {}!!!".format(Logger.app_logfile))
-        Logger.app.error("Your configuration or settings are incorrect see log {}!!!".format(e))
 
     # ...as well as pulling down webinspect server config files from github...
     try:
@@ -176,6 +171,12 @@ def scan(config, **kwargs):
         Logger.app.critical("{} does not have permission to access the git repo: {}".format(
         webinspect_config.webinspect_git, e))
 
+    # ...and settings...
+    try:
+        webinspect_settings = webinspect_config.parse_webinspect_options(ops)
+    except AttributeError as e:
+        Logger.console.info("Your configuration or settings are incorrect see log {}!!!".format(Logger.app_logfile))
+        Logger.app.error("Your configuration or settings are incorrect see log {}!!!".format(e))
 
     # OK, we're ready to actually do something now
 

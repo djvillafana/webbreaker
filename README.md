@@ -57,7 +57,9 @@ WebBreaker implements a command-line interface (CLI), specific to a Product.  Th
 
     WEBINSPECT SCAN OPTIONS:
       --settings            WebInspect scan configuration file, if no setting file is specified the ```Default``` file
-                            shipped with WebInspect will be used.
+                            shipped with WebInspect will be used. If used WebBreaker will by default check for your file
+                            in the repo downloaded from webinspect.ini. If your file is not in that repo, you may instead pass
+                            this option an absolute file path to your file. Ex) --settings Users/Matt/Documents/my_settings_file.xml
       --scan_name           Used for the command 'webinspect scan' as both a scan instance variable and file name.  Default value is
                             _`WEBINSPECT-<random-5-alpha-numerics>`, or Jenkins global
                             environment variables may be declared, such as $BUILD_TAG.
@@ -139,6 +141,8 @@ WebBreaker implements a command-line interface (CLI), specific to a Product.  Th
 | `webbreaker webinspect scan --settings important_site_auth` |
 | _Scan using multiple of same option_ |
 | `webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
+| _Scan using absolute settings path_ | 
+| `webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml` |
 
 | __Fortify List Commands__ |
 | ------------------------------ |
@@ -161,6 +165,7 @@ WebBreaker implements a command-line interface (CLI), specific to a Product.  Th
 | `webbreaker fortify upload --version important_site_auth --scan_name auth_scan` |
 
 ----
+
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
