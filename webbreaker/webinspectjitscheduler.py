@@ -20,15 +20,15 @@ class WebInspectJitScheduler(object):
         try:
             endpoint = self.__get_available_endpoints__()
             if not endpoint:
-                Logger.file_logr.critical("No available endpoints discovered")
+                Logger.console.info("No available endpoints discovered!")
                 return None
 
-                Logger.file_logr.critical("JIT Scheduler has selected endpoint {}.".format(endpoint[0]))
+                Logger.console.info("JIT Scheduler has selected endpoint {}.".format(endpoint[0]))
             return endpoint[0]
 
         except:  # Ugly. Not sure what to expect for problems, so Pokemon handling, catch'em all :(
             e = sys.exc_info()[0]
-            Logger.file_logr.critical("Error finding endpoints. {}".format(e))
+            Logger.app.error("Error finding endpoints. {}".format(e))
             return None
 
     def __convert_size_to_count__(self):
@@ -83,7 +83,7 @@ class WebInspectJitScheduler(object):
             for scan in response.data:
                 if scan['Status'] == 'Running':
                     active_scans += 1
-                    Logger.file_logr.debug('Engine {} has {} active scans'.format(endpoint, str(active_scans)))
+                    Logger.app.debug('Engine {} has {} active scans'.format(endpoint, str(active_scans)))
             if active_scans < int(max_concurrent_scans):
                 return True
 
