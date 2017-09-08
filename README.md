@@ -114,83 +114,53 @@ Usage:
 ### Cheatsheet
 **For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
 
-#### __WebInspect List Commands__
+----
+| __WebInspect List__ |
+| ------------------------------ |
+| _List all scans_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083` |
+| _Query scans_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083 --scan_name important_site` |
+| _List with http_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083 --protocol http` |
+
+| __WebInspect Downlaod Commands__ |
+| ------------------------------ |
+| _Download Scan_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth` |
+| _Download Scan as XML_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth -x xml` |
+| _Download Scan with http_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth --protocol http` |
+
+| __WebInspect Scan Commands__ |
+| ------------------------------ |
+| _Basic Scan_ |
+| `webbreaker webinspect scan --settings important_site_auth` |
+| _Scan using multiple of same option_ |
+| `webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
+
+| __Fortify List Commands__ |
+| ------------------------------ |
+| _Initial Listing with authentication_ |
+| `webbreaker fortify list --fortify_user $FORTIFY_SSC_USER --fortify_password $FORTIFY_SSC_PASS` |
+| _List with username/password prompts_ |
+| `webbreaker fortify list` |
+| _List versions of application_ |
+| `webbreaker fortify list --application webinspect` |
+
+| __Fortify Upload Commands__ |
+| ------------------------------ |
+| _Upload with passed auth_ |
+| `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth` |
+| _Upload with username/password prompts_ |
+| `webbreaker fortify upload --version important_site_auth` |
+| _Upload with application override_ |
+| `webbreaker fortify upload --application my_other_app --version important_site_auth` |
+| _Upload with scan_name override_ |
+| `webbreaker fortify upload --version important_site_auth --scan_name auth_scan` |
 
 ----
-_List all scans_
-
-`webbreaker webinspect list --server webinspect-server-1.example.com:8083`
-
-_Query scans_
-
-`webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site`
-
-_List with http_
-
-`webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http`
-
-#### __WebInspect Downlaod Commands__
-
-----
-_Download Scan_
-
-`webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth`
-
-_Download Scan as XML_
-
-`webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml`
-
-_Download Scanwith http_
-
-`webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http`
-
-#### __WebInspect Scan Commands__
-
-----
-_Basic Scan_
-
-`webbreaker webinspect scan --settings important_site_auth`
-
-_Scan using multiple of same option_
-
-`webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com`
-
-#### __Fortify List Commands__
-
-----
-_List with passed auth_ 
-
-`webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS`
-
-_List with username/password prompts_
-
-`webbreaker fortify list`
-
-_List versions of application_
-
-`webbreaker fortify list --application webinspect`
-
-#### __Fortify Upload Commands__
-
-----
-_Upload with passed auth_
-
-`webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth`
-
-_Upload with username/password prompts_
-
-`webbreaker fortify upload --version important_site_auth`
-
-_Upload with application override_
-
-`webbreaker fortify upload --application my_other_app --version important_site_auth`
-
-_Upload with scan_name override_ 
-
-`webbreaker fortify upload --version important_site_auth --scan_name auth_scan`
-
-----
-
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
