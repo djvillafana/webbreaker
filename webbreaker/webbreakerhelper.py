@@ -65,6 +65,6 @@ class WebBreakerHelper(object):
             else:
                 raise AttributeError("webinspect is the only recognized command")
         except AttributeError as e:
-            Logger.file_logr.debug('Unrecognized command. {}'.format(str(e)))
+            Logger.app.debug('Unrecognized command. {}'.format(str(e)))
             parser.print_help()
             exit(1)

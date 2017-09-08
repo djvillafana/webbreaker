@@ -35,7 +35,7 @@ def get_console_logger():
     # Only send stout INFO level messages
     ch.setLevel(logging.INFO)
     # stout does not include less than and equal to WARNING
-    ch.addFilter(LessThenFilter(logging.WARNING))
+    #ch.addFilter(LessThanFilter(logging.WARNING))
     console_logger.addHandler(ch)
     return console_logger
 
@@ -67,7 +67,7 @@ def get_debug_logger(name=None):
 
 
 # Override existing hierarchical filter logic in logger mod
-class LessThenFilter(logging.Filter):
+class LessThanFilter(logging.Filter):
     def __init__(self, level):
         self._level = level
         logging.Filter.__init__(self)
@@ -82,4 +82,6 @@ class Logger():
         self.app = get_app_logger("__webbreaker__")
         self.debug = get_debug_logger("__webbreaker_debug__")
         self.console = get_console_logger()
+        self.app_logfile = APP_LOG
+        self.app_debug.logfile = DEBUG_LOG
 

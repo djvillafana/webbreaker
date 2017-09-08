@@ -21,8 +21,7 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 ### Usage ###
 WebBreaker implements a command-line interface (CLI), specific to a Product.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  The two Products supported are WebInspect and Fortfiy.  Below is complete documentation of WebBreaker's usage.
 
-Usage:
-=======
+
     SYNOPSIS:
     webbreaker [webinspect|fortify] [list|scan|download|upload] [OPTIONS]
 
@@ -113,23 +112,6 @@ Usage:
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
 * ```python setup.py install --user```
-
-### Usage Examples ###
-
-The three (3) command-line usage examples illustrate the minimum _required_, _scans without a setting file_ and _continuous deployment_ with a Jenkins Free Style job.
-
-+ Minimal WebBreaker command, setup.py needs to be ran once for installing python dependencies.  Your Python site-packages must be included in your PATH to run from the command-line locally.
-```
-> webbreaker webinspect scan --settings=Default.xml
-```
-+ WebBreaker command without the _`--settings`_ option, creating an authenitcated scan with no pre-determined scan values.
-```
-> webbreaker webinspect scan --login_macro=some_login_macro --start_urls=example.com --scan_policy=Standard --scan_start=url --allowed_hosts=foo.example.com bar.example.com
-```
-+ Jenkins command-line with Shell plugin in Build or Post-Build task:
-```
-> webbreaker webinspect scan --settings=Default.xml --scan_name=${BUILD_TAG}
-```
 
 ### Executing or Running WebBreaker ###
 
