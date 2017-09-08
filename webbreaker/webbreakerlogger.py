@@ -83,5 +83,5 @@ class Logger():
         self.debug = get_debug_logger("__webbreaker_debug__")
         self.console = get_console_logger()
         self.app_logfile = APP_LOG
-        self.app_debug.logfile = DEBUG_LOG
+        self.app_debug = DEBUG_LOG
 

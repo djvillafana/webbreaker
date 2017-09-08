@@ -62,7 +62,7 @@ def cli(config, help):
     # Show something pretty to start
     f = Figlet(font='slant')
     Logger.console.info("\n\n{0}Version {1}\n".format(f.renderText('WebBreaker'), version))
-    Logger.console.info("Logging to files: {0} and {1}".format(Logger.app_logfile, Logger.app_debug_logfile))
+    Logger.console.info("Logging to files: {}".format(Logger.app_logfile))
     config.help = help
 
 
