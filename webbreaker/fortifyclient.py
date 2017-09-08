@@ -139,7 +139,7 @@ class FortifyClient(object):
 
         return None
 
-    def upload_scan(self):
+    def upload_scan(self, file_name):
         api = FortifyApi(self.ssc_server, token=self.token, verify_ssl=False)
         project_version_id = self.__get_project_version__()
         # If our project doesn't exist, exit upload_scan
@@ -150,12 +150,12 @@ class FortifyClient(object):
         if not project_version_id:
             project_version_id = self.__create_project_version__()
         if project_version_id:
-            response = api.upload_artifact_scan(file_path=('{0}.{1}'.format(self.fortify_version, self.extension)),
+            response = api.upload_artifact_scan(file_path=('{0}.{1}'.format(file_name, self.extension)),
                                                 project_version_id=project_version_id)
 
         if response.success:
             Logger.file_logr.critical(
-                "Your scan file {0}.{1}, has been successfully uploaded to {2}!".format(self.fortify_version,
+                "Your scan file {0}.{1}, has been successfully uploaded to {2}!".format(file_name,
                                                                                         self.extension,
                                                                                         self.ssc_server))
         elif not response.success and "401" in response.message:

@@ -425,13 +425,18 @@ def fortify_list(config, fortify_user, fortify_password, application):
 @click.option('--version',
               required=True,
               help="Name of Fortify application version which you would like to upload a scan to.")
+@click.option('--scan_name',
+              required=False,
+              help="If the name of the file is different than --version, use this option to to specify the name of the file (without the extension)")
 @pass_config
-def upload(config, fortify_user, fortify_password, application, version):
+def upload(config, fortify_user, fortify_password, application, version, scan_name):
     fortify_config = FortifyConfig()
     # Fortify only accepts fpr scan files
     x = 'fpr'
     if application:
         fortify_config.application_name = application
+    if not scan_name:
+        scan_name = version
     try:
         if not fortify_user or not fortify_password:
             Logger.file_logr.debug("No Fortify username or password provided. Checking fortify.ini for secret")
@@ -462,7 +467,7 @@ def upload(config, fortify_user, fortify_password, application, version):
             fortify_config.write_secret(fortify_client.token)
             Logger.file_logr.debug("Fortify secret written to fortify.ini")
 
-        reauth = fortify_client.upload_scan()
+        reauth = fortify_client.upload_scan(file_name=scan_name)
 
         if reauth == -2:
             # The given application doesn't exist
@@ -480,7 +485,7 @@ def upload(config, fortify_user, fortify_password, application, version):
             fortify_config.write_secret(fortify_client.token)
             Logger.file_logr.debug("Fortify secret written to fortify.ini")
             Logger.file_logr.debug("Attempting to rerun 'fortify upload'")
-            app_error = fortify_client.upload_scan()
+            app_error = fortify_client.upload_scan(file_name=scan_name)
 
             if app_error == -2:
                 # The given application doesn't exist
