@@ -225,20 +225,12 @@ class WebInspectConfig(object):
         try:
             if not os.path.isdir(full_path):
                 Logger.console.info(
-                    "\n--------------------------------------------------------------------------------------"
-                    "------------------------------------\n"
-                    "Getting ALL of the WebInspect configurations from {}\n"
-                    "---------------------------------------------------------------------------------------"
-                        .format(full_path))
+                    "Fetching the WebInspect configurations from {}\n".format(full_path))
                 Repo.clone_from(self.webinspect_git, full_path)
 
             else:
                 Logger.console.info(
-                    "\n"
-                    "Updating your WebInspect configurations from {}\n"
-                    "---------------------------------------------------------------------------------------"
-                    "-----------------------------------\n"
-                        .format(full_path))
+                    "Updating your WebInspect configurations from {}.format(full_path))
                 repo = Repo.init(full_path)
                 repo.git.reset('--hard')
                 repo.remotes.origin.pull()
