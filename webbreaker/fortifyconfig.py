@@ -11,7 +11,7 @@ from webbreaker.webbreakerlogger import Logger
 
 from subprocess import CalledProcessError
 
-from Crypto.Cipher import AES
+from cryptography.fernet import Fernet
 import base64
 
 # TODO: Test on Python2
@@ -34,20 +34,16 @@ class FortifyConfig(object):
             if encrypted_token:
                 try:
                     with open(".webbreaker", 'r') as secret_file:
-                        raw = secret_file.readline().strip()
-                        aes_secret = base64.b64decode(raw)
-                    Logger.file_logr.debug("AES key found. Attempting decryption of Fortify token")
+                        fernet_key = secret_file.readline().strip()
+                    Logger.file_logr.debug("Fernet key found. Attempting decryption of Fortify token")
                 except IOError:
-                    Logger.file_logr.error("Error retrieving encryption secret, file does not exist. Please run 'python "
+                    Logger.file_logr.error("Error retrieving Fernet key, file does not exist. Please run 'python "
                                            "setup.py secret' to reset")
                     sys.exit(1)
 
-                # Add proper padding to secret
-                # aes_secret = "{:<24}".format(aes_secret)
-
                 try:
-                    cipher = AES.new(aes_secret)
-                    self.secret = cipher.decrypt(base64.b64decode(encrypted_token))
+                    cipher = Fernet(fernet_key)
+                    self.secret = cipher.decrypt(encrypted_token.encode()).decode()
                     Logger.file_logr.debug("Token decrypted with no errors")
                 except ValueError as e:
                     Logger.file_logr.error("Error decrypting stored Fortify token...exiting without completeing command")
@@ -66,11 +62,10 @@ class FortifyConfig(object):
 
         try:
             with open(".webbreaker", 'r') as secret_file:
-                raw = secret_file.readline().strip()
-                aes_secret = base64.b64decode(raw)
-            Logger.file_logr.debug("AES key found. Attempting encryption of new Fortify token")
+                fernet_key = secret_file.readline().strip()
+            Logger.file_logr.debug("Fernet key found. Attempting encryption of new Fortify token")
         except IOError:
-            Logger.file_logr.error("Error retrieving encryption secret, file does not exist. Please run 'python setup.py "
+            Logger.file_logr.error("Error retrieving Fernet key, file does not exist. Please run 'python setup.py "
                                    "secret' to reset")
             sys.exit(1)
 
@@ -78,8 +73,8 @@ class FortifyConfig(object):
         # aes_secret = "{:<24}".format(aes_secret)
 
         try:
-            cipher = AES.new(aes_secret)
-            encrypted_token = base64.b64encode(cipher.encrypt(self.secret))
+            cipher = Fernet(fernet_key)
+            encrypted_token = cipher.encrypt(self.secret.encode())
             Logger.file_logr.debug("Token encrypted with no errors. Writing encrypted token to fortify.ini")
         except ValueError as e:
             Logger.file_logr.error("Error encrypting Fortify token...exiting without completeing command")
@@ -88,7 +83,7 @@ class FortifyConfig(object):
         config_file = os.path.abspath(os.path.join('webbreaker', 'etc', 'fortify.ini'))
         try:
             config.read(config_file)
-            config.set('fortify','fortify_secret', encrypted_token)
+            config.set('fortify','fortify_secret', encrypted_token.decode())
             with open(config_file, 'w') as new_config:
                 config.write(new_config)
 

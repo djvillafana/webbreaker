@@ -12,6 +12,7 @@
 - [Usage](#usage)
 - [Logging](#logging)
 - [Notifications](#notification)
+- [Verbose Cheatsheet](#verbose_cheatsheet)
 
 [Configurations](#configurations)
 
@@ -71,17 +72,110 @@ Webbreak utilizes a structure of upper-level and lower-level commands to enable 
 
 A promper Webbreaker command utilizes the structure 'webbreaker [webinspect|fortify] [lower-level command] [OPTIONS]'
 
-#### Lower Level Command Features
-- webinspect scan
-  - This command will choose an available webinspect server and initiate a scan based on the given options. Upon scan completion the results will be downloaded in the specified format.
-- webinspect list
-  - This command requires the --server option and will list the Name, ID, and Status of all scans found on that host. This command also accepts the --scan_name option and if provided will limit the output to scans which match that name.
-- webinspect download
-  - This command requires the --server and --scan_name options and will download scan results in the desired format. If multiple scans match --scan_name they will be listed and nothing will be downloaded.
-- fortify list
-  - This command accepts a --application option and if given will list all version of that application found in Fortify. If --application  is not used, this command will list all versions of all applications found on Fortify.
-- fortify upload
-  - This command requires the --fortify_version and -x options and will upload the scan file {fortify_version}.{x} to the specified application version on Fortify.
+### Verbose Cheatsheet
+
+## Logging
+WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
+
+## Notifications
+WebBreaker provides notifications for start-scan and end-scan events. A simple publisher/subscriber pattern is implemented under the ```webbreaker/notifiers```.  A Reporter object will hold a collection of Notifiers, each of which implements a Notify function responsible for creating the desired notification. Currently, two notification types are implemented email and database.
+
+The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
+
+If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
+
+#### WebInspect List
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083
+```
+> python webbreaker webinspect list --server webinspect-server-1.example.com:8083
+```
+
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083 whose scan name matches the query 'important_site'
+```
+> webbreaker webinspect list --server webinspect-server-1.example.com:8083 --scan_name important_site
+```
+
+List all scans (scan name, scan id, and scan status) found on the server webinspect-server-1.example.com:8083. Interaction with server will use http instead of https.
+```
+$ webbreaker webinspect list --server webinspect-server-1.example.com:8083 --protocol http
+```
+#### WebInspect Downlaod
+For these examples, assume the server has scans with names important_site_auth, important_site_api, important_site_internal
+
+Download the results from the important_site_auth scan found on webinspect-server-2.example.com:8083 as an fpr file
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth
+```
+
+Because multiple scan names on webinspect-server-2.example.com:8083 match 'important_site', this command will list them in output and no files will be downloaded
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site
+```
+
+Download the results of scan 'important_site_auth' from webinspect-server-2.example.com:8083 in xml format
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth -x xml
+```
+
+Download the results from the important_site_auth scan found on webinspect-server-2.example.com:8083 as an fpr file. All interaction with webinspect-server-2.example.com:8083 will use http instead of https
+```
+> webbreaker webinspect download --server webinspect-server-2.example.com:8083 --scan_name important_site_auth --protocol http
+```
+
+#### WebInspect Scan
+
+Launch a scan using the settings file important_site_auth.xml (WebBreaker assumes the .xml extension)
+```
+> webbreaker webinspect scan --settings important_site_auth
+```
+
+Launch a scan using the settings file important_site_auth.xml (WebBreaker assumes the .xml extension) with the allowed hosts important-site.com and m.important-site.com
+**Note: The start_urls, allowed_hosts, and workflow_macros options can all be used multiple times in this format**
+```
+> webbreaker webinspect scan --settings important_site_auth --allowed_hosts important-site.com --allowed_hosts m.important-site.com
+```
+
+#### Fortify List
+
+List all versions found on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.
+```
+> webbreaker fortify list --fortify_user $FORT_USER --fortify_password $FORT_PASS
+```
+
+List all versions found on Fortify (using the url listed in fortify.ini). User will be prompted for their username and password to authenticate to Fortify.
+**Note: When username/password authentication is successful, Fortify will provide a token that is valid for 24 hours. WebBreaker encryptes this token and stores it in fortify.ini. As long as you have a valid token, you will not be prompted for your username and password.**
+```
+> webbreaker fortify list
+```
+
+List all versions found on Fortify (using the url listed in fortify.ini) that belong to the application 'webinspect'
+**Note: Fortify applications are also sometimes refered to as projects**
+```
+> webbreaker fortify list --application webinspect
+```
+
+#### Fortify Upload
+
+Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). User will be prompted for their username and password to authenticate to Fortify.
+**Note: When username/password authentication is successful, Fortify will provide a token that is valid for 24 hours. WebBreaker encryptes this token and stores it in fortify.ini. As long as you have a valid token, you will not be prompted for your username and password.**
+```
+> webbreaker fortify upload --version important_site_auth
+```
+
+Upload the file important_site_auth.fpr to the important_site_auth version on Fortify (using the url listed in fortify.ini). Authentication to Fortify will use the username and password I have stored as environment variables.
+```
+> webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth
+```
+
+Upload the file important_site_auth.fpr to the important_site_auth version under the application my_other_app on Fortify. If --application is not provided, WebBreaker will use the application name found in fortify.ini
+```
+> webbreaker fortify upload --application my_other_app --version important_site_auth
+```
+
+Upload the file auth_scan.fpr to the important_site_auth version on Fortify
+```
+> webbreaker fortify upload --version important_site_auth --scan_name auth_scan
+```
 
 ## Logging
 WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
@@ -109,7 +203,6 @@ project_template=Prioritized High Risk Issue Template
 application_name=WEBINSPECT
 fortify_secret=XXX
 ```
-
 
 ### WebInspect Configuration: `webinspect_config`
 WebInspect scan configuration files for `settings`, `policies`, and `webmacros` are versioned and hosted from a GIT repository determined in `webbreaker/etc/webinspect.ini`.  Additionally, all WebInspect policies and servers are managed from this configuration file.  The section `[api endpoints]` provides a _Just-In-Time_ (JIT) scheduler or the ability to load balance scans amongst a WebInspect cluster.

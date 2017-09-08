@@ -12,7 +12,6 @@ try:
 except ImportError: #Python3
     import urllib.parse as urlparse
 
-from webbreaker.notifiers import database
 from webbreaker.webbreakerconfig import WebBreakerConfig
 
 handle_scan_event = None
@@ -69,20 +68,3 @@ def scan_running():
         signal(SIGINT, original_sigint_handler)
         signal(SIGTERM, original_sigterm_handler)
 
-
-def save_issues(webinspect_client, scanid, webinspect_settings):
-
-    try:
-        database_settings = WebBreakerConfig().parse_database_settings()
-        db = database.DatabaseNotifier(database_settings)
-        all_issues = webinspect_client.get_scan_issues(scan_guid=scanid)
-        t = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        for issues in json.loads(all_issues):
-            issue={}
-            issue['scanid'] = scanid
-            issue['scanname'] = webinspect_settings['webinspect_scan_name']
-            issue['timestamp'] = t
-            issue['issue_json'] = json.dumps(issues)
-            db.issue_export(issue)
-    except Exception:
-        pass
