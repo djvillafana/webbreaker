@@ -15,8 +15,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
-
 requires = ['click',
             'configparser>=3.5.0',
             'dpath>=1.4.0',
@@ -34,6 +32,7 @@ requires = ['click',
             'requests']
 
 tests_require = ['pytest', 'pytest-cache', 'pytest-cov']
+
 
 class PyTest(TestCommand):
     user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]

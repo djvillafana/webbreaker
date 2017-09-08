@@ -7,21 +7,21 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 ![WebBreaker System Architecture](images/WebBreakerSystemArchitecture.jpg)
 
 ### Supported Features ###
-* Immutable WebInspect scan configurations for Cloud scanning
-* Extensible scan telemetry with ArcSight, ELK, Splunk, etc.
-* Event notifications with scan launch and completion
-* [Superset data visualization dashboard](https://github.com/airbnb/superset) support for scan status and performance.
-* Enterprise load balancing between 2 or greater WebInspect Sensors
-* Support for scan collaborative analysis with Fortify SSC
+* Command-line (CLI) scan administration of WebInspect with Foritfy SSC products.
+* [Jenkins Continuous Deployment](https://jenkins.io) support
 * Docker container support
-* Jenkins global environmental variable inheritance with scan options.
-* WebInspect REST API support for v9.30 and above.
+* Email alerting or notification.
+* Extensible event logging with scan administration and results.
+* [WebInspect REST API](https://pypi.python.org/pypi/webinspectapi) support for v9.30 and later.
+* [Fortify Software Security Center (SSC) REST API](https://pypi.python.org/pypi/fortifyapi) support for v16.10 and later.
+* WebInspect scan cluster support between two (2) or greater WebInspect servers/sensors
+* Extensible scan telemetry with ELK and Splunk
+* GIT support for WebInspect scan configurations.
 
 ### Usage ###
 WebBreaker implements a command-line interface (CLI), specific to a Product.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  The two Products supported are WebInspect and Fortfiy.  Below is complete documentation of WebBreaker's usage.
 
-Usage:
-=======
+
     SYNOPSIS:
     webbreaker [webinspect|fortify] [list|scan|download|upload] [OPTIONS]
 
@@ -166,23 +166,6 @@ There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
 * ```python setup.py install --user```
 
-### Usage Examples ###
-
-The three (3) command-line usage examples illustrate the minimum _required_, _scans without a setting file_ and _continuous deployment_ with a Jenkins Free Style job.
-
-+ Minimal WebBreaker command, setup.py needs to be ran once for installing python dependencies.  Your Python site-packages must be included in your PATH to run from the command-line locally.
-```
-> webbreaker webinspect scan --settings Default
-```
-+ WebBreaker command without the _`--settings`_ option, creating an authenitcated scan with no pre-determined scan values.
-```
-> webbreaker webinspect scan --login_macro some_login_macro --start_urls example.com --scan_policy Standard --scan_start url --allowed_hosts foo.example.com --allowed_hosts bar.example.com
-```
-+ Jenkins command-line with Shell plugin in Build or Post-Build task:
-```
-> webbreaker webinspect scan --settings Default --scan_name ${BUILD_TAG}
-```
-
 ### Executing or Running WebBreaker ###
 
 ```
@@ -207,16 +190,6 @@ Webbreaker complete.
 
 * Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```
 * WebBreaker is compatible with Jenkins Global Environmental variables or other custom parameterized strings in Jenkins can be passed, for example --scan_name=${BUILD_TAG}.
-
-### Logging
-WebBreaker may be implemented with Elastic Stack for log aggregation. Recommended compenents include Filebeat agents installed on all WebInspect servers, forwarding to Logstash, and visualized in Kibana. General implementation details are [here](https://qbox.io/blog/welcome-to-the-elk-stack-elasticsearch-logstash-kibana/).  A recommended approach is to tag log events and queries with ```WebInspect``` and ```webbreaker```, but remember queries are case sensitive.
-
-### Notifications
-WebBreaker provides notifications for start-scan and end-scan events. A simple publisher/subscriber pattern is implemented under the ```webbreaker/notifiers```.  A Reporter object will hold a collection of Notifiers, each of which implements a Notify function responsible for creating the desired notification. Currently, two notification types are implemented email and database.
-
-The email notifier merges the provided event data into an HTML email message and sends the message. All SMTP-related settings are stored in [webbreaker/etc/email.ini](https://github.com/target/webbreaker/blob/master/webbreaker/etc/email.ini), and read during the webbreaker execution.
-
-If an error occurs on behalf of the notifiers at any point during the process of creating or sending notifications, the event will be logged, without any interruption of WebBreaker execution or the WebInspect scan.
 
 ### Bugs and Feature Requests
 

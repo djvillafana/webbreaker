@@ -48,7 +48,8 @@ class WebInspectConfig(object):
             self.webinspect_dir = webinspect_dict['dir']
             self.mapped_policies = webinspect_dict['mapped_policies']
         except KeyError as e:
-            Logger.file_logr.error("Your configurations file or scan setting is incorrect : {}!!!".format(e))
+            Logger.console.error("Your configurations file or scan setting is incorrect see log: {}!!!".format(Logger.app_logfile))
+            Logger.app.error("Your configurations file or scan setting is incorrect : {}!!!".format(e))
 
     def __get_webinspect_settings__(self):
         webinspect_dict = {}
@@ -72,9 +73,9 @@ class WebInspectConfig(object):
                                             config.options('webinspect_size')]
 
         except (configparser.NoOptionError, CalledProcessError) as noe:
-            Logger.file_logr.error("{} has incorrect or missing values {}".format(webinspect_setting, noe))
+            Logger.app.error("{} has incorrect or missing values {}".format(webinspect_setting, noe))
         except configparser.Error as e:
-            Logger.file_logr.error("Error reading webinspect settings {} {}".format(webinspect_setting, e))
+            Logger.app.error("Error reading webinspect settings {} {}".format(webinspect_setting, e))
 
         return webinspect_dict
 
@@ -98,7 +99,7 @@ class WebInspectConfig(object):
                                        "xmlns:string", namespaces={'xmlns': 'http://spidynamics.com/schemas/scanner/1.0'}):
                 targets.add(target.text)
         except Exception as e:
-            Logger.file_logr.error("Unable to determine scan targets {0}".format(e))
+            Logger.app.error("Unable to determine scan targets {0}".format(e))
 
         return targets
 
@@ -115,7 +116,7 @@ class WebInspectConfig(object):
                     options['scan_name'] = "webinspect" + "-" + "".join(
                         random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
             except AttributeError as e:
-                Logger.file_logr.error("The {0} is unable to be created! {1}".format(options['scan_name'], e))
+                Logger.app.error("The {0} is unable to be created! {1}".format(options['scan_name'], e))
 
         if options['upload_settings']:
             try:
@@ -124,7 +125,7 @@ class WebInspectConfig(object):
                                                                             'settings',
                                                                             options['upload_settings'])))
             except (AttributeError, TypeError) as e:
-                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_settings'], e))
+                Logger.app.error("The {0} is unable to be assigned! {1}".format(options['upload_settings'], e))
         else:
             options['upload_settings'] = str("{}".format(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                                                    'webbreaker', 'etc', 'webinspect', 'settings',
@@ -158,7 +159,7 @@ class WebInspectConfig(object):
                                                                          webmacro + '.webmacro'))) for webmacro in
                                             options['upload_webmacros']]
             except (AttributeError, TypeError) as e:
-                Logger.file_logr.error("The {0} is unable to be assigned! {1}".format(options['upload_webmacros'], e))
+                Logger.app.error("The {0} is unable to be assigned! {1}".format(options['upload_webmacros'], e))
 
         # if upload_policy provided explicitly, follow that. otherwise, default to scan_policy if provided
         if options['upload_policy']:
@@ -196,28 +197,23 @@ class WebInspectConfig(object):
             webinspect_dict['fortify_user'] = options['fortify_user']
 
         except argparse.ArgumentError as e:
-            Logger.file_logr.error("There was an error in the options provided!: ".format(e))
+            Logger.app.error("There was an error in the options provided!: ".format(e))
 
         return webinspect_dict
 
     def fetch_webinspect_configs(self):
         try:
             if not os.path.isdir(self.webinspect_dir):
-                Logger.file_logr.info(
-                    "\n--------------------------------------------------------------------------------------"
-                    "------------------------------------\n"
-                    "Getting ALL of the WebInspect configurations from {}\n"
-                    "---------------------------------------------------------------------------------------"
+                Logger.console.info(
+                    "\n"
+                    "Fetching the WebInspect configurations from {}\n"
                         .format(self.webinspect_git))
                 Repo.clone_from(self.webinspect_git, self.webinspect_dir)
 
             else:
-                Logger.file_logr.info(
-                    "\n--------------------------------------------------------------------------------------"
-                    "------------------------------------\n"
+                Logger.console.info(
+                    "\n"
                     "Updating your WebInspect configurations from {}\n"
-                    "---------------------------------------------------------------------------------------"
-                    "-----------------------------------\n"
                         .format(self.webinspect_git))
                 repo = Repo.init(self.webinspect_dir)
                 repo.git.reset('--hard')
@@ -225,4 +221,4 @@ class WebInspectConfig(object):
         # TODO: Need an exit here
         #Cmd('git') failed due to: exit code(128)
         except (CalledProcessError, AttributeError) as e:
-            Logger.file_logr.error("Uh oh something is wrong with your WebInspect configurations!!".format(e))
+            Logger.app.error("Uh oh something is wrong with your WebInspect configurations!!".format(e))
