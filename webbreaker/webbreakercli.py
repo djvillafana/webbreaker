@@ -39,7 +39,6 @@ from webbreaker.fortifyconfig import FortifyConfig
 from webbreaker.webinspectscanhelpers import create_scan_event_handler
 #from webbreaker.webinspectscanhelpers import write_end_event
 from webbreaker.webinspectscanhelpers import scan_running
-from webbreaker.webinspectscanhelpers import save_issues
 
 
 handle_scan_event = None
@@ -251,7 +250,6 @@ def scan(config, **kwargs):
 
         webinspect_client.export_scan_results(scan_id, 'fpr')
         webinspect_client.export_scan_results(scan_id, 'xml')
-        save_issues(webinspect_client, scan_id, webinspect_settings)
         handle_scan_event('scan_end')
 
         Logger.console.critical('Scan is complete.')
@@ -427,15 +425,24 @@ def fortify_list(config, fortify_user, fortify_password, application):
 @fortify.command()
 @click.option('--fortify_user')
 @click.option('--fortify_password')
-@click.option('--fortify_version',
+@click.option('--application',
+              required=False,
+              help="Name of the Fortify application that version belongs to. If this option is not provided, application_name from fortify.ini will be used.")
+@click.option('--version',
               required=True,
               help="Name of Fortify application version which you would like to upload a scan to.")
-@click.option('-x',
-              required=True,
-              help="Extension of scan file being uploaded")
+@click.option('--scan_name',
+              required=False,
+              help="If the name of the file is different than --version, use this option to to specify the name of the file (without the extension)")
 @pass_config
-def upload(config, fortify_user, fortify_password, fortify_version, x):
+def upload(config, fortify_user, fortify_password, application, version, scan_name):
     fortify_config = FortifyConfig()
+    # Fortify only accepts fpr scan files
+    x = 'fpr'
+    if application:
+        fortify_config.application_name = application
+    if not scan_name:
+        scan_name = version
     try:
         if not fortify_user or not fortify_password:
             Logger.console.info("No Fortify username or password provided. Checking fortify.ini for secret")
@@ -444,7 +451,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                 fortify_client = FortifyClient(fortify_url=fortify_config.ssc_url,
                                                project_template=fortify_config.project_template,
                                                application_name=fortify_config.application_name,
-                                               token=fortify_config.secret, scan_name=fortify_version, extension=x)
+                                               token=fortify_config.secret, scan_name=version, extension=x)
             else:
                 Logger.console.info("Fortify secret not found in fortify.ini")
                 fortify_user = click.prompt('Fortify user')
@@ -453,7 +460,7 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                                project_template=fortify_config.project_template,
                                                application_name=fortify_config.application_name,
                                                fortify_username=fortify_user,
-                                               fortify_password=fortify_password, scan_name=fortify_version,
+                                               fortify_password=fortify_password, scan_name=version,
                                                extension=x)
                 fortify_config.write_secret(fortify_client.token)
                 Logger.console.info("Fortify secret written to fortify.ini")
@@ -462,11 +469,15 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                            project_template=fortify_config.project_template,
                                            application_name=fortify_config.application_name,
                                            fortify_username=fortify_user,
-                                           fortify_password=fortify_password, scan_name=fortify_version, extension=x)
+                                           fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
             Logger.console.info("Fortify secret written to fortify.ini")
 
-        reauth = fortify_client.upload_scan()
+        reauth = fortify_client.upload_scan(file_name=scan_name)
+
+        if reauth == -2:
+            # The given application doesn't exist
+            Logger.file_logr.critical("Fortify Application {} does not exist. Unable to upload scan.".format(application))
 
         if reauth == -1 and fortify_config.secret:
             Logger.console.info("Fortify secret invalid...reauthorizing")
@@ -476,11 +487,17 @@ def upload(config, fortify_user, fortify_password, fortify_version, x):
                                            project_template=fortify_config.project_template,
                                            application_name=fortify_config.application_name,
                                            fortify_username=fortify_user,
-                                           fortify_password=fortify_password, scan_name=fortify_version, extension=x)
+                                           fortify_password=fortify_password, scan_name=version, extension=x)
             fortify_config.write_secret(fortify_client.token)
+
             Logger.console.info("Fortify secret written to fortify.ini")
-            Logger.console.info("Attempting to rerun 'fortify upload'")
-            fortify_client.upload_scan()
+            Logger.console.info("Attempting to re-run 'fortify upload'")
+            app_error = fortify_client.upload_scan(file_name=scan_name)
+
+            if app_error == -2:
+                # The given application doesn't exist
+                Logger.console.critical(
+                    "Fortify Application {} does not exist. Unable to upload scan.".format(application))
     except:
         Logger.console.critical("Unable to complete command 'fortify upload'")
 

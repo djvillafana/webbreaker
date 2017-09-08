@@ -8,7 +8,6 @@ except ImportError: #Python3
     import configparser
 import os
 from webbreaker.webbreakerhelper import WebBreakerHelper
-from webbreaker.notifiers import database
 from webbreaker.notifiers import emailer
 from webbreaker.webbreakerlogger import Logger
 from webbreaker.notifiers import reporter
@@ -62,29 +61,11 @@ class WebBreakerConfig(object):
 
         return emailer_dict
 
-    def parse_database_settings(self):
-        db_conn_settings = {}
-        database_setting = os.path.abspath(os.path.join('webbreaker', 'etc', 'logging.ini'))
-        try:
-            if os.path.exists(database_setting):
-                config.read(database_setting)
-                config_file_path = config.get('database', 'config_file_path')
-                config.read(config_file_path)
-                db_conn_settings = config._sections['connection']
-                db_conn_settings.pop('__name__', None)
-            else:
-                Logger.file_logr.debug("There is no {}".format(database_setting))
-        except (KeyError, AttributeError, Exception) as e:
-            Logger.file_logr.debug("Error reading database connection settings {}".format(e))
-
-        return db_conn_settings
 
     def create_reporter(self):
 
         notifiers = []
 
-        database_settings = self.parse_database_settings()
-        notifiers.append(database.DatabaseNotifier(database_settings))
 
         emailer_settings = self.parse_emailer_settings()
         notifiers.append(emailer.EmailNotifier(emailer_settings))

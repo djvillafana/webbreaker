@@ -102,12 +102,65 @@ WebBreaker implements a command-line interface (CLI), specific to a Product.  Th
       --fortify_user /      If provided WebBreaker authenticates to Fortify using these credentials. If not provided
         --fortify_password  WebBreaker attempts to use a secret for fortify.ini. If no secret is found our the secret is
                             no longer valid, you will be prompted for these credentials.
-      --fortify_version     Used for the command 'fortify upload' this option specifies the application version name and
+      --application         If provided WebBreaker will look for version under this application name instead of the one
+                            provided in fortify.ini
+      --version     Used for the command 'fortify upload' this option specifies the application version name and
                             is used to both locate the file to be uploaded and the correct fortify application version
                             to upload the file to.
-      -x                    Specifies the extension of the file to be uploaded. WebBreaker will attempt to upload the file
-                            {fortify_version}.{x}
+      --scan_name           If the scan file you wish to upload has a different name then --version, this option can
+                            override which file WebBreaker uploads. Note: WebBreaker still assume the .fpr extension so
+                            it should not be included here
 
+### Cheatsheet
+**For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
+
+----
+| __WebInspect List__ |
+| ------------------------------ |
+| _List all scans_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083` |
+| _Query scans_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083 --scan_name important_site` |
+| _List with http_ |
+| `webbreaker webinspect list --server webinspect-1.example.com:8083 --protocol http` |
+
+| __WebInspect Downlaod Commands__ |
+| ------------------------------ |
+| _Download Scan_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth` |
+| _Download Scan as XML_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth -x xml` |
+| _Download Scan with http_ |
+| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth --protocol http` |
+
+| __WebInspect Scan Commands__ |
+| ------------------------------ |
+| _Basic Scan_ |
+| `webbreaker webinspect scan --settings important_site_auth` |
+| _Scan using multiple of same option_ |
+| `webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
+
+| __Fortify List Commands__ |
+| ------------------------------ |
+| _Initial Listing with authentication_ |
+| `webbreaker fortify list --fortify_user $FORTIFY_SSC_USER --fortify_password $FORTIFY_SSC_PASS` |
+| _List with username/password prompts_ |
+| `webbreaker fortify list` |
+| _List versions of application_ |
+| `webbreaker fortify list --application webinspect` |
+
+| __Fortify Upload Commands__ |
+| ------------------------------ |
+| _Upload with passed auth_ |
+| `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth` |
+| _Upload with username/password prompts_ |
+| `webbreaker fortify upload --version important_site_auth` |
+| _Upload with application override_ |
+| `webbreaker fortify upload --application my_other_app --version important_site_auth` |
+| _Upload with scan_name override_ |
+| `webbreaker fortify upload --version important_site_auth --scan_name auth_scan` |
+
+----
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
@@ -116,7 +169,7 @@ There are two (2) methods to install WebBreaker from github.com.
 ### Executing or Running WebBreaker ###
 
 ```
-webbreaker webinspect --url=https://some.webinspect.server.com --settings=MyCustomWebinspectSetting --scan_policy=Application --scan_name=some_scan_name
+webbreaker webinspect scan --settings MyCustomWebinspectSetting --scan_policy Application --scan_name some_scan_name
  _       __     __    ____                  __            
 | |     / /__  / /_  / __ )________  ____ _/ /_____  _____
 | | /| / / _ \/ __ \/ __  / ___/ _ \/ __ `/ //_/ _ \/ ___/
