@@ -230,7 +230,7 @@ class WebInspectConfig(object):
 
             else:
                 Logger.console.info(
-                    "Updating your WebInspect configurations from {}.format(full_path))
+                    "Updating your WebInspect configurations from {}".format(full_path))
                 repo = Repo.init(full_path)
                 repo.git.reset('--hard')
                 repo.remotes.origin.pull()
