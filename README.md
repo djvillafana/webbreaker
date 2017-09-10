@@ -14,164 +14,72 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 * Extensible event logging with scan administration and results.
 * [WebInspect REST API](https://pypi.python.org/pypi/webinspectapi) support for v9.30 and later.
 * [Fortify Software Security Center (SSC) REST API](https://pypi.python.org/pypi/fortifyapi) support for v16.10 and later.
-* WebInspect scan cluster support between two (2) or greater WebInspect servers/sensors
-* Extensible scan telemetry with ELK and Splunk
-* GIT support for WebInspect scan configurations.
+* WebInspect scan cluster support between two (2) or greater WebInspect servers/sensors.
+* Capabilities for extensible scan telemetry with ELK and Splunk.
+* GIT support for centrally managing [WebInspect scan configurations](https://github.com/automationdomination/Webinspect).
 
 ### Usage ###
-WebBreaker implements a command-line interface (CLI), specific to a Product.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  The two Products supported are WebInspect and Fortfiy.  Below is complete documentation of WebBreaker's usage.
+WebBreaker is a command-line interface (CLI) client.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
 
+Below is a Cheatsheet of supported commands.  See our complete [_WebBreaker Documentation_](https://target.github.io/webbreaker/) for further configuration, usage, and installation.
+    
 
-    SYNOPSIS:
-    webbreaker [webinspect|fortify] [list|scan|download|upload] [OPTIONS]
+    List all scans
+    webbreaker webinspect list --server webinspect-1.example.com:8083
+    
+    Query scans
+    webbreaker webinspect list --server webinspect-1.example.com:8083 --scan_name important_site
+    
+    List with http
+    webbreaker webinspect list --server webinspect-1.example.com:8083 --protocol http
 
-    DESCRIPTION:
-    WebBreaker is a light-weight, scalable, distributed, and automated dynamic security testing framework with a rich
-    command set providing both high-level Product operations and Dynamic Application Security Test Orchestration (DASTO) on Products.
-
-    COMMANDS:
-    Webbreaker is separated into Upper ("Products") and Lower level ("Actions") commands with their respective options.
-
-    UPPER-LEVEL COMMANDS:
-    webbreaker-fortify
-    Administer WebInspect scan results with Fortify Software Security Center (SSC).  Available `Actions` are
-    add, list, and upload.
-
-    webbreaker-webinspect
-    Select WebInspect as your commercial scanner or Dynamic Application Security Test (DAST) product.  Available  `Actions` are
-    scan, list and download.
-
-    LOWER-LEVEL COMMANDS
-    webbraker-list
-    List current and past WebInspect scans.
-
-    webbreaker-scan
-    Create or launch a WebInspect scan from a fully licensed WebInspect server or host. Scan results are automatically
-    downloaded in both XML and FPR formats.
-
-    webbreaker-download
-    Download or export a WebInspect scan locally.
-
-    fortify-upload
-    Upload a WebInspect scan to Fortify Software Security Center (SSC).
-
-    WEBINSPECT SCAN OPTIONS:
-      --settings            WebInspect scan configuration file, if no setting file is specified the ```Default``` file
-                            shipped with WebInspect will be used. If used WebBreaker will by default check for your file
-                            in the repo downloaded from webinspect.ini. If your file is not in that repo, you may instead pass
-                            this option an absolute file path to your file. Ex) --settings Users/Matt/Documents/my_settings_file.xml
-      --scan_name           Used for the command 'webinspect scan' as both a scan instance variable and file name.  Default value is
-                            _`WEBINSPECT-<random-5-alpha-numerics>`, or Jenkins global
-                            environment variables may be declared, such as $BUILD_TAG.
-      --scan_policy         Overrides the existing scan policy from the value in the setting file from `--settings`,
-                            see `webinspect.ini` for built-in values.  Any custom policy must include only the GUID.
-                            Do NOT include the `.policy` extension.
-      --login_macro         Overrides the login macro declared in the original setting file from `--settings` and
-                            uploads it to the WebInspect server.
-      --workflow_macros     Workflow macros are located under webbreaker/etc/webinspect/webmacros, all webmacro files
-                            end with a .webmacro extension, do NOT include the `webmacro` extension.
-      --scan_mode           Acceptable values are `crawl`, `scan`, or `all`.
-      --scan_scope          Acceptable values are `all`, `strict`, `children`, and `ancestors`.
-      --scan_start          Acceptable values are `url` or `macro`.
-      --start_urls          Enter a single url or multiple each with it's own --start_urls.
-                            For example --start_urls http://test.example.com --start_urls http://test2.example.com
-      --allowed_hosts       Hosts to scan, either a single host or a list of hosts separated by spaces. If not provided,
-                            all values from `--start_urls` will be used.
-      --size                WebInspect scan servers are managed with the `webinspect.ini` file, however a medium or large
-                            size WebInspect server defined in the config can be explicitely declared with `--size medium`
-                            or `--size large`.
-
-      WEBINSPECT LIST OPTIONS:
-      --server              Query a list of past and current scans from a specific WebInspect server or host.
-      --scan_name           Limit query results to only those matching a given scan name
-      --protocol            Specify which protocol should be used to contact the WebInspect server. Valid protocols
-                            are 'https' and 'http'. If not provided, this option will default to 'https'
-
-      WEBINSPECT DOWNLOAD OPTIONS:
-      --scan_name           Specify the desired scan name to be downloaded from a specific WebInspect server or host.
-      --server              Required option for downloading a specific WebInspect scan.  Server must be appended to all
-                            WebInspect download Actions.
-      --protocol            Specify which protocol should be used to contact the WebInspect server. Valid protocols
-                            are 'https' and 'http'. If not provided, this option will default to 'https'
-
-      FORTIFY LIST OPTIONS:
-      --application         Provides a listing of Fortify SSC Version(s) within a specific Application or Project.
-      --fortify_user /      If provided WebBreaker authenticates to Fortify using these credentials. If not provided
-        --fortify_password  WebBreaker attempts to use a secret for fortify.ini. If no secret is found our the secret is
-                            no longer valid, you will be prompted for these credentials.
-
-      FORTIFY UPLOAD OPTIONS:
-      --fortify_user /      If provided WebBreaker authenticates to Fortify using these credentials. If not provided
-        --fortify_password  WebBreaker attempts to use a secret for fortify.ini. If no secret is found our the secret is
-                            no longer valid, you will be prompted for these credentials.
-      --application         If provided WebBreaker will look for version under this application name instead of the one
-                            provided in fortify.ini
-      --version     Used for the command 'fortify upload' this option specifies the application version name and
-                            is used to both locate the file to be uploaded and the correct fortify application version
-                            to upload the file to.
-      --scan_name           If the scan file you wish to upload has a different name then --version, this option can
-                            override which file WebBreaker uploads. Note: WebBreaker still assume the .fpr extension so
-                            it should not be included here
-
-### Cheatsheet
-**For a more descriptive cheatsheet, view the Verbose CheatSheet section of our docs**
-
-----
-| __WebInspect List__ |
-| ------------------------------ |
-| _List all scans_ |
-| `webbreaker webinspect list --server webinspect-1.example.com:8083` |
-| _Query scans_ |
-| `webbreaker webinspect list --server webinspect-1.example.com:8083 --scan_name important_site` |
-| _List with http_ |
-| `webbreaker webinspect list --server webinspect-1.example.com:8083 --protocol http` |
-
-| __WebInspect Downlaod Commands__ |
-| ------------------------------ |
-| _Download Scan_ |
-| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth` |
-| _Download Scan as XML_ |
-| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth -x xml` |
-| _Download Scan with http_ |
-| `webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth --protocol http` |
-
-| __WebInspect Scan Commands__ |
-| ------------------------------ |
-| _Basic Scan_ |
-| `webbreaker webinspect scan --settings important_site_auth` |
-| _Scan using multiple of same option_ |
-| `webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
-| _Scan using absolute settings path_ | 
-| `webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml` |
-
-| __Fortify List Commands__ |
-| ------------------------------ |
-| _Initial Listing with authentication_ |
-| `webbreaker fortify list --fortify_user $FORTIFY_SSC_USER --fortify_password $FORTIFY_SSC_PASS` |
-| _List with username/password prompts_ |
-| `webbreaker fortify list` |
-| _List versions of application_ |
-| `webbreaker fortify list --application webinspect` |
-
-| __Fortify Upload Commands__ |
-| ------------------------------ |
-| _Upload with passed auth_ |
-| `webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth` |
-| _Upload with username/password prompts_ |
-| `webbreaker fortify upload --version important_site_auth` |
-| _Upload with application override_ |
-| `webbreaker fortify upload --application my_other_app --version important_site_auth` |
-| _Upload with scan_name override_ |
-| `webbreaker fortify upload --version important_site_auth --scan_name auth_scan` |
+    Download WebInspect Scan:
+    webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth
+    
+    Download WebInspect Scan as XML
+    webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth -x xml
+    
+    Download WebInspect Scan with http
+    webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth --protocol http
+    
+    Basic WebInspect Scan
+    webbreaker webinspect scan --settings important_site_auth
+    
+    Advanced WebInspect Scan with overrides
+    webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
+    
+    Scan with local WebInspect settings 
+    webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml
+    
+    Initial Fortify SSC Initial Listing with Authentication
+    webbreaker fortify list --fortify_user $FORTIFY_SSC_USER --fortify_password $FORTIFY_SSC_PASS
+    
+    Interactive Listing of All Fortify SSC Application/Versions:
+    webbreaker fortify list
+    
+    List Fortify SSC Versions of an Application:
+    webbreaker fortify list --application webinspect
+    
+    Upload with passed auth
+    webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth
+    
+    Upload with username/password prompts
+    webbreaker fortify upload --version important_site_auth
+    
+    Upload with application override
+    webbreaker fortify upload --application my_other_app --version important_site_auth
+    
+    Upload with scan_name overrides
+    webbreaker fortify upload --version important_site_auth --scan_name auth_scan
 
 ----
 
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
-* ```python setup.py install --user```
+* ```python setup.py install```
 
-### Executing or Running WebBreaker ###
+### WebBreaker Console Output ###
 
 ```
 webbreaker webinspect scan --settings MyCustomWebinspectSetting --scan_policy Application --scan_name some_scan_name
