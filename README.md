@@ -18,6 +18,16 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 * Capabilities for extensible scan telemetry with ELK and Splunk.
 * GIT support for centrally managing [WebInspect scan configurations](https://github.com/automationdomination/Webinspect).
 
+### Quick Local Installation ###
+There are two (2) methods to install WebBreaker from github.com.
+* ```git clone https://github.com/target/webbreaker```
+* ```python setup.py install```
+
+**NOTE:**
+
+* Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```
+* WebBreaker is compatible with Jenkins Global Environmental variables or other custom parameterized strings in Jenkins can be passed, for example --scan_name=${BUILD_TAG}.
+
 ### Usage ###
 WebBreaker is a command-line interface (CLI) client.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
 
@@ -74,11 +84,6 @@ Below is a Cheatsheet of supported commands.  See our complete [_WebBreaker Docu
 
 ----
 
-### Quick Local Installation ###
-There are two (2) methods to install WebBreaker from github.com.
-* ```git clone https://github.com/target/webbreaker```
-* ```python setup.py install```
-
 ### WebBreaker Console Output ###
 
 ```
@@ -98,11 +103,6 @@ Scan results file is available: some_scan_name.fpr
 Scan has finished.
 Webbreaker complete.
 ```
-
-**NOTE:**
-
-* Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```
-* WebBreaker is compatible with Jenkins Global Environmental variables or other custom parameterized strings in Jenkins can be passed, for example --scan_name=${BUILD_TAG}.
 
 ### Bugs and Feature Requests
 
