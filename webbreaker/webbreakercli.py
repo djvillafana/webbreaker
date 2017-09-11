@@ -199,8 +199,8 @@ def scan(config, **kwargs):
             Logger.console.info("Provided scan_policy {} listed as builtin policyID {}".format(webinspect_client.scan_policy, policy_guid))
             Logger.console.info("Checking to make sure a policy with that ID exists in WebInspect.")
             if not webinspect_client.policy_exists(policy_guid):
-                Logger.file_logr.error(
-                    "Scan policy {} cannot be located on server. Stopping".format(webinspect_client.scan_policy))
+                Logger.console.error(
+                    "Scan policy {} cannot be located on the WebInspect server. Stopping".format(webinspect_client.scan_policy))
                 exit(1)
             else:
                 Logger.console.info("Found policy {} in WebInspect.".format(policy_guid))
@@ -478,7 +478,7 @@ def upload(config, fortify_user, fortify_password, application, version, scan_na
 
         if reauth == -2:
             # The given application doesn't exist
-            Logger.file_logr.critical("Fortify Application {} does not exist. Unable to upload scan.".format(application))
+            Logger.console.critical("Fortify Application {} does not exist. Unable to upload scan.".format(application))
 
         if reauth == -1 and fortify_config.secret:
             Logger.console.info("Fortify secret invalid...reauthorizing")
