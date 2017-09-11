@@ -35,27 +35,27 @@ class FortifyConfig(object):
                 try:
                     with open(".webbreaker", 'r') as secret_file:
                         fernet_key = secret_file.readline().strip()
-                    Logger.file_logr.debug("Fernet key found. Attempting decryption of Fortify token")
+                    Logger.app.debug("Fernet key found. Attempting decryption of Fortify token")
                 except IOError:
-                    Logger.file_logr.error("Error retrieving Fernet key, file does not exist. Please run 'python "
+                    Logger.console.error("Error retrieving Fernet key, file does not exist. Please run 'python "
                                            "setup.py secret' to reset")
                     sys.exit(1)
 
                 try:
                     cipher = Fernet(fernet_key)
                     self.secret = cipher.decrypt(encrypted_token.encode()).decode()
-                    Logger.file_logr.debug("Token decrypted with no errors")
+                    Logger.app.debug("Token decrypted with no errors")
                 except ValueError as e:
-                    Logger.file_logr.error("Error decrypting stored Fortify token...exiting without completeing command")
-                    Logger.file_logr.debug(e)
+                    Logger.console.error("Error decrypting the Fortify token.  Exiting now, see log {}!".format(Logger.app_logfile))
+                    Logger.app.debug(e)
                     sys.exit(1)
             else:
                 self.secret = None
 
         except (configparser.NoOptionError, CalledProcessError) as noe:
-            Logger.file_logr.error("{} has incorrect or missing values {}".format(config_file, noe))
+            Logger.console.error("{} has incorrect or missing values {}".format(config_file, noe))
         except configparser.Error as e:
-            Logger.file_logr.error("Error reading {} {}".format(config_file, e))
+            Logger.app.error("Error reading {} {}".format(config_file, e))
 
     def write_secret(self, secret):
         self.secret = secret
@@ -63,9 +63,9 @@ class FortifyConfig(object):
         try:
             with open(".webbreaker", 'r') as secret_file:
                 fernet_key = secret_file.readline().strip()
-            Logger.file_logr.debug("Fernet key found. Attempting encryption of new Fortify token")
+            Logger.app.debug("Fernet key found. Attempting encryption of new Fortify token.")
         except IOError:
-            Logger.file_logr.error("Error retrieving Fernet key, file does not exist. Please run 'python setup.py "
+            Logger.console.error("Error retrieving Fernet key, file does not exist. Please run 'python setup.py "
                                    "secret' to reset")
             sys.exit(1)
 
@@ -75,10 +75,11 @@ class FortifyConfig(object):
         try:
             cipher = Fernet(fernet_key)
             encrypted_token = cipher.encrypt(self.secret.encode())
-            Logger.file_logr.debug("Token encrypted with no errors. Writing encrypted token to fortify.ini")
+            Logger.console.debug("Token encrypted and saved to fortify.ini")
         except ValueError as e:
-            Logger.file_logr.error("Error encrypting Fortify token...exiting without completeing command")
-            Logger.file_logr.debug(e)
+            Logger.console.error("Error encrypting Fortify token...exiting without completeing command."
+                                 "Please see log {}".fortify(Logger.app_logfile))
+            Logger.app.error(e)
             sys.exit(1)
         config_file = os.path.abspath(os.path.join('webbreaker', 'etc', 'fortify.ini'))
         try:
@@ -88,6 +89,8 @@ class FortifyConfig(object):
                 config.write(new_config)
 
         except (configparser.NoOptionError, CalledProcessError) as noe:
-            Logger.file_logr.error("{} has incorrect or missing values {}".format(config_file, noe))
+            Logger.app.error("{} has incorrect or missing values, see log file {}".format(config_file, Logger.app_logfile))
+            Logger.app.error("{} has incorrect or missing values {}".format(config_file, noe))
         except configparser.Error as e:
-            Logger.file_logr.error("Error reading {} {}".format(config_file, e))
+            Logger.console.error("Error reading {}, see log file: {}".format(config_file, Logger.app_logfile))
+            Logger.app.error("Error reading {} {}".format(config_file, e))
