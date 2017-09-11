@@ -17,51 +17,54 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 * WebInspect scan cluster support between two (2) or greater WebInspect servers/sensors.
 * Capabilities for extensible scan telemetry with ELK and Splunk.
 * GIT support for centrally managing [WebInspect scan configurations](https://github.com/automationdomination/Webinspect).
+* Python compatibility with versions 2.x or 3.x
 
 ### Quick Local Installation ###
 There are two (2) methods to install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
+* ```export PATH=$PATH:$PYTHONPATH```
 * ```python setup.py install```
 
 **NOTE:**
 
-* Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```
+* As with any Python application [pip]() is required for install and execution.
+* Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```.
 * WebBreaker is compatible with Jenkins Global Environmental variables or other custom parameterized strings in Jenkins can be passed, for example --scan_name=${BUILD_TAG}.
 
 ### Usage ###
-WebBreaker is a command-line interface (CLI) client.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
+WebBreaker is a command-line interface (CLI) client.  See our complete [_WebBreaker Documentation_](https://target.github.io/webbreaker/) for further configuration, usage, and installation.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
 
-Below is a Cheatsheet of supported commands.  See our complete [_WebBreaker Documentation_](https://target.github.io/webbreaker/) for further configuration, usage, and installation.
-    
+Below is a Cheatsheet of supported commands to get you started.  
 
-    List all scans
+
+    List all scans:
     webbreaker webinspect list --server webinspect-1.example.com:8083
     
-    Query scans
+    Query scans:
     webbreaker webinspect list --server webinspect-1.example.com:8083 --scan_name important_site
     
-    List with http
+    List with http:
     webbreaker webinspect list --server webinspect-1.example.com:8083 --protocol http
 
     Download WebInspect Scan:
     webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth
     
-    Download WebInspect Scan as XML
+    Download WebInspect Scan as XML:
     webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth -x xml
     
-    Download WebInspect Scan with http
+    Download WebInspect Scan with http:
     webbreaker webinspect download --server webinspect-2.example.com:8083 --scan_name important_site_auth --protocol http
     
-    Basic WebInspect Scan
+    Basic WebInspect Scan:
     webbreaker webinspect scan --settings important_site_auth
     
-    Advanced WebInspect Scan with overrides
+    Advanced WebInspect Scan with overrides:
     webbreaker webinspect scan --settings important_site_auth --allowed_hosts example.com --allowed_hosts m.example.com` |
     
-    Scan with local WebInspect settings 
+    Scan with local WebInspect settings:
     webbreaker webinspect scan --settings /Users/Matt/Documents/important_site_auth.xml
     
-    Initial Fortify SSC Initial Listing with Authentication
+    Initial Fortify SSC Initial Listing with Authentication:
     webbreaker fortify list --fortify_user $FORTIFY_SSC_USER --fortify_password $FORTIFY_SSC_PASS
     
     Interactive Listing of All Fortify SSC Application/Versions:
@@ -70,16 +73,16 @@ Below is a Cheatsheet of supported commands.  See our complete [_WebBreaker Docu
     List Fortify SSC Versions of an Application:
     webbreaker fortify list --application webinspect
     
-    Upload with passed auth
+    Upload with passed auth:
     webbreaker fortify upload --fortify_user $FORT_USER --fortify_password $FORT_PASS --version important_site_auth
     
-    Upload with username/password prompts
+    Upload with username/password prompts:
     webbreaker fortify upload --version important_site_auth
     
-    Upload with application override
+    Upload with application override:
     webbreaker fortify upload --application my_other_app --version important_site_auth
     
-    Upload with scan_name overrides
+    Upload with scan_name overrides:
     webbreaker fortify upload --version important_site_auth --scan_name auth_scan
 
 ----

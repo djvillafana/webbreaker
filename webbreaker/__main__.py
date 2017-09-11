@@ -23,7 +23,6 @@ try: #Python3
 except:
     import urllib
 import datetime
-import webbreaker.webbreakerhelper
 import requests.exceptions
 import json
 from git.exc import GitCommandError
