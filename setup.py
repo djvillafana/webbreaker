@@ -47,6 +47,7 @@ class PyTest(TestCommand):
         err = pytest.main(shlex.split(self.pytest_args))
         sys.exit(err)
 
+
 def set_secret():
     key = Fernet.generate_key()
     with open(".webbreaker", 'w') as secret_file:
@@ -77,7 +78,8 @@ try:
         author_email='brandon.spruth2@target.com, jim.nelson2@target.com, matthew.dunaj@target.com',
         license='MIT',
         url="https://github.com/target/webbreaker",
-        packages=find_packages(exclude=['docs', 'tests']),
+        packages=find_packages(exclude=['docs', 'images', 'tests*']),
+        #packages=['webbreaker'],
         include_package_data=True,
         zip_safe=False,
         py_modules=['webbreaker.webbreakercli'],
@@ -86,12 +88,14 @@ try:
                                   'webbreaker/etc/email.ini',
                                   'webbreaker/etc/webinspect.ini',
                                   'images/WebBreakerArchitecture.jpg']
-        },
+                      },
         install_requires=requires,
-        entry_points='''
-            [console_scripts]
-            webbreaker=webbreaker.webbreakercli:cli
-        ''',
+        entry_points={
+            'console_scripts':[
+                #'webbreaker = webbreaker.webbreakercli:cli',
+                'webbreaker = webbreaker.__main__:main',
+            ],
+        },
         classifiers=[
             'Programming Language :: Python',
             'Development Status :: 4 - Beta',

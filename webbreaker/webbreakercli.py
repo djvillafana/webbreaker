@@ -22,7 +22,8 @@ try: #Python3
     import urllib.request as urllib
 except:
     import urllib
-import os, datetime
+import datetime
+import webbreaker.webbreakerhelper
 import requests.exceptions
 import json
 from git.exc import GitCommandError
@@ -35,9 +36,7 @@ from webbreaker.webinspectclient import WebinspectClient
 from webbreaker.webinspectqueryclient import WebinspectQueryClient
 from webbreaker.fortifyclient import FortifyClient
 from webbreaker.fortifyconfig import FortifyConfig
-
 from webbreaker.webinspectscanhelpers import create_scan_event_handler
-#from webbreaker.webinspectscanhelpers import write_end_event
 from webbreaker.webinspectscanhelpers import scan_running
 
 
