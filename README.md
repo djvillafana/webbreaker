@@ -20,14 +20,14 @@ WebBreaker truly enables all members of the Software Security Development Life-C
 * Python compatibility with versions 2.x or 3.x
 
 ### Quick Local Installation ###
-There are two (2) methods to install WebBreaker from github.com.
+Install WebBreaker from github.com.
 * ```git clone https://github.com/target/webbreaker```
 * ```export PATH=$PATH:$PYTHONPATH```
 * ```python setup.py install```
 
 **NOTE:**
 
-* As with any Python application [pip]() is required for install and execution.
+* As with any Python application [pip](https://pip.pypa.io/en/stable/installing) is required for install and execution.
 * Include your site-packages, if they are not declared ```export PATH=$PATH:$PYTHONPATH```.
 * WebBreaker is compatible with Jenkins Global Environmental variables or other custom parameterized strings in Jenkins can be passed, for example --scan_name=${BUILD_TAG}.
 
