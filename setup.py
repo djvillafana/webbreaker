@@ -79,10 +79,9 @@ try:
         license='MIT',
         url="https://github.com/target/webbreaker",
         packages=find_packages(exclude=['docs', 'images', 'tests*']),
-        #packages=['webbreaker'],
         include_package_data=True,
         zip_safe=False,
-        py_modules=['webbreaker.webbreakercli'],
+        #py_modules=['webbreaker.webbreakercli'],
         package_data={'configs': ['webbreaker/etc/logging.ini',
                                   'webbreaker/etc/fortify.ini',
                                   'webbreaker/etc/email.ini',
@@ -91,11 +90,10 @@ try:
                       },
         install_requires=requires,
         entry_points={
-            'console_scripts':[
-                #'webbreaker = webbreaker.webbreakercli:cli',
-                'webbreaker = webbreaker.__main__:main',
-            ],
-        },
+                    'console_scripts':[
+                        'webbreaker = webbreaker.__main__:cli',
+                    ],
+                },
         classifiers=[
             'Programming Language :: Python',
             'Development Status :: 4 - Beta',
