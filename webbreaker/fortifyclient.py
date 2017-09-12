@@ -3,10 +3,9 @@
 
 import os
 import socket
-from webbreakerhelper import WebBreakerHelper
-from webbreakerlogger import Logger
+from webbreaker.webbreakerhelper import WebBreakerHelper
+from webbreaker.webbreakerlogger import Logger
 from fortifyapi.fortify import FortifyApi
-
 
 
 class FortifyClient(object):

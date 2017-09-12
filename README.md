@@ -33,8 +33,14 @@ Install WebBreaker from github.com.
 
 ### Usage ###
 WebBreaker is a command-line interface (CLI) client.  See our complete [_WebBreaker Documentation_](https://target.github.io/webbreaker/) for further configuration, usage, and installation.  The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
+<<<<<<< HEAD
 
 Below is a Cheatsheet of supported commands to get you started.    
+=======
+
+Below is a Cheatsheet of supported commands to get you started.  
+
+>>>>>>> console_script
 
     List all scans:
     webbreaker webinspect list --server webinspect-1.example.com:8083

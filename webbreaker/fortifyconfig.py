@@ -8,11 +8,8 @@ except ImportError: #Python3
 import os
 import sys
 from webbreaker.webbreakerlogger import Logger
-
 from subprocess import CalledProcessError
-
 from cryptography.fernet import Fernet
-import base64
 
 # TODO: Test on Python2
 try:  # Python 2
