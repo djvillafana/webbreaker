@@ -36,10 +36,9 @@ WebBreaker is a command-line interface (CLI) client.  See our complete [_WebBrea
 
 The CLI supports upper-level and lower-level commands with respective options to enable interaction with Dynamic Application Security Test (DAST) products.  Currently, the two Products supported are WebInspect and Fortfiy (more to come in the future!!)
 
----
-
-
 Below is a Cheatsheet of supported commands to get you started.  
+
+---
 
 
     List all scans:
