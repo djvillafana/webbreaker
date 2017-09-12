@@ -59,11 +59,6 @@ if sys.argv[-1] == 'secret':
     set_secret()
     sys.exit(0)
 
-# build and install helper
-if sys.argv[-1] == 'install':
-    os.system('python setup.py install --user')
-    sys.exit(0)
-
 if sys.argv[-1] == 'build':
     os.system('python setup.py sdist bdist_wheel')
     sys.exit(0)
