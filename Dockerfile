@@ -20,7 +20,7 @@ RUN wget http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz --no-check-certi
   make && make altinstall
 
 # Strip the Python 3.6 binary:
-  strip /usr/local/lib/libpython3.6m.so.1.0
+RUN strip /usr/local/lib/libpython3.6m.so.1.0
 
 RUN wget https://bootstrap.pypa.io/get-pip.py --no-check-certificate && \
   python get-pip.py && \
